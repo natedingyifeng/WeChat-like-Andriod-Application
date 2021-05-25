@@ -1,5 +1,6 @@
 package com.dyf.andriod_frontend;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -98,9 +99,9 @@ public class RegisterActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if(jsonObject.getBoolean("success")){
-                        Looper.prepare();
                         Toast.makeText(getApplicationContext(), R.string.register_success, Toast.LENGTH_SHORT).show();
-                        Looper.loop();
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(), jsonObject.getString("msg"), Toast.LENGTH_SHORT).show();
