@@ -45,7 +45,7 @@ public class MomentsCommentAdapter extends RecyclerView.Adapter<MomentsCommentAd
     @Override
     public void onBindViewHolder(@NonNull MomentsCommentViewHolder holder, int position) {
         MomentsComment comment = data.get(position);
-
+//        holder.setIsRecyclable(false); // 禁止复用
 
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         ForegroundColorSpan colorSpan = new ForegroundColorSpan(context.getColor(R.color.blue_name));
@@ -63,9 +63,9 @@ public class MomentsCommentAdapter extends RecyclerView.Adapter<MomentsCommentAd
         holder.contentView.setText(ssb);
     }
 
-    public void addData(int position, MomentsComment comment){
-        data.add(position, comment);
-        notifyItemInserted(position);
+    public void addData(MomentsComment comment){
+        data.add(comment);
+        notifyDataSetChanged();
     }
 
     @Override

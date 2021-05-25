@@ -64,6 +64,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
 
     @Override
     public void onBindViewHolder(@NonNull MomentsViewHolder holder, int position) {
+        holder.setIsRecyclable(false);// 禁止复用
         Moment moment = moments.get(position);
         int type = getItemViewType(position);
         Glide.with(context).load(moment.getMomentsOwner().getAvatarUrl()).into(holder.avatarImage);
@@ -90,6 +91,8 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
 
         LinkedList<MomentsComment> comments = moment.getComments();
         mca = new MomentsCommentAdapter(comments, context);
+        mca.setHasStableIds(true);
+
         holder.commentsRecyclerView.setAdapter(mca);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         holder.commentsRecyclerView.setLayoutManager(layoutManager);
@@ -157,6 +160,11 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
         return sb.toString();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     private void comment(MomentsViewHolder holder, int position){
         // TODO 调用输入框，进行评论
         final EditText inputServer = new EditText(context);
@@ -167,10 +175,10 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             public void onClick(DialogInterface dialog, int which) {
                 inputServer.getText().toString();
                 MomentsComment comment = new MomentsComment(moments.get(position).getId(),inputServer.getText().toString(), new User(username, nickname), null);
-//                LinkedList<MomentsComment> comments = moments.get(position).getComments();
-//                comments.add(comment);
-//                moments.get(position).setComments(comments);
-                mca.addData(mca.getItemCount(), comment);
+                moments.get(position).getComments().add(comment);
+                mca.notifyDataSetChanged();
+                notifyDataSetChanged();
+//                mca.addData(comment);
             }
         });
         builder.show();

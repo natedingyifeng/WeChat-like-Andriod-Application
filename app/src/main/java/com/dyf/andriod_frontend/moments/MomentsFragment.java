@@ -61,8 +61,8 @@ public class MomentsFragment extends Fragment {
 
         LinkedList<MomentsComment> comments = new LinkedList<>();
         comments.add(new MomentsComment("1", "讲的不错！", lq, null));
-        comments.add(new MomentsComment("1", "确实！", dyf, null));
-        comments.add(new MomentsComment("1", "哇，非常厉害！",xyh, null));
+
+
 
         User TestUser = new User("fhdksjahk","Ifreet", "yihao_xu", "123456", "12345678900", "吃饱喝足，去……", "User", getString(R.string.test_user_avatar_url));
         LinkedList<Moment> data = new LinkedList<>();
@@ -71,19 +71,22 @@ public class MomentsFragment extends Fragment {
         data.add(new Moment(getString(R.string.test_moment_content), new LinkedList<>(comments),
                 getString(R.string.test_moment_time), getString(R.string.test_user_id), getString(R.string.test_moment_time), new ArrayList<>(likedUsers), TestUser,"TEXT", new ArrayList<String>(imagesUrl)));
 
-        imagesUrl.add(getString(R.string.test_image_url_1));
+        comments.add(new MomentsComment("1", "确实！", dyf, null));
+        imagesUrl.add(getString(R.string.test_image_url_2));
         data.add(new Moment(getString(R.string.test_moment_content), new LinkedList<>(comments),
                 getString(R.string.test_moment_time), getString(R.string.test_user_id), getString(R.string.test_moment_time), new ArrayList<>(likedUsers), TestUser,"TEXT", new ArrayList<String>(imagesUrl)));
 
-        imagesUrl.add(getString(R.string.test_image_url_1));
+        comments.add(new MomentsComment("1", "哇，非常厉害！",xyh, null));
+        imagesUrl.add(getString(R.string.test_image_url_3));
         data.add(new Moment(getString(R.string.test_moment_content), new LinkedList<>(comments),
                 getString(R.string.test_moment_time), getString(R.string.test_user_id), getString(R.string.test_moment_time), new ArrayList<>(likedUsers), TestUser,"TEXT", new ArrayList<String>(imagesUrl)));
 
-        imagesUrl.add(getString(R.string.test_image_url_1));
+        imagesUrl.add(getString(R.string.test_image_url_4));
         data.add(new Moment(getString(R.string.test_moment_content), new LinkedList<>(comments),
                 getString(R.string.test_moment_time), getString(R.string.test_user_id), getString(R.string.test_moment_time), new ArrayList<>(likedUsers), TestUser,"TEXT", new ArrayList<String>(imagesUrl)));
 
         MomentsAdapter momentsAdapter = new MomentsAdapter(data, getContext());
+        momentsAdapter.setHasStableIds(true);
         recyclerView.setAdapter(momentsAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
