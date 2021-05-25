@@ -9,7 +9,7 @@
     <!-- Menu -->
     <string name="chats">聊天</string>
     <string name="moments">动态</string>
-    <string name="contacts">联系</string>
+    <string name="contacts">通讯录</string>
     <string name="settings">设置</string>
 
     <!--  Login  -->
@@ -49,9 +49,9 @@
 
     <string name="nickname1">陈诗瑶</string>
     <string name="nickname2">董诗琪</string>
-    <string name="nickname3">孙宇红</string>
-    <string name="nickname4">陈凌霄</string>
-    <string name="nickname5">郭建敏</string>
+    <string name="nickname3">丁一峰</string>
+    <string name="nickname4">李祁</string>
+    <string name="nickname5">徐亦豪</string>
     <string name="nickname6">丁一峰</string>
     <string name="nickname7">旗平青</string>
     <string name="nickname8">盈小真</string>

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,7 +51,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+        Button title_back = findViewById(R.id.title_back);
+        title_back.setVisibility(View.GONE);
+        Button title_back_2 = findViewById(R.id.title_back2);
+        title_back_2.setVisibility(View.GONE);
 
         loginButton = findViewById(R.id.login_btn);
         registerLink = findViewById(R.id.register_link_textView);
@@ -105,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("username", username);
                         editor.commit();
-                        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                     }else{
                         Looper.prepare();

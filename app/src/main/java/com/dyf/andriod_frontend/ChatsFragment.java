@@ -42,6 +42,8 @@ public class ChatsFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TextView title = getActivity().findViewById(R.id.title_text);
+        title.setText("聊天");
         Button title_back = getActivity().findViewById(R.id.title_back);
         title_back.setVisibility(View.GONE);
         Button title_back_2 = getActivity().findViewById(R.id.title_back2);

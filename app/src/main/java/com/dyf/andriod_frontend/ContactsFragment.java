@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +44,8 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        TextView title = getActivity().findViewById(R.id.title_text);
+        title.setText(R.string.contacts);
     }
 
     @Override
@@ -60,11 +62,11 @@ public class ContactsFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
         LinkedList<Contact> contacts = new LinkedList<>();
-        contacts.add(new Contact("陈诗瑶", R.drawable.contacts_1));
-        contacts.add(new Contact("董诗琪", R.drawable.contacts_2));
-        contacts.add(new Contact("孙宇红", R.drawable.contacts_3));
-        contacts.add(new Contact("陈凌霄", R.drawable.contacts_4));
-        contacts.add(new Contact("郭建敏", R.drawable.contacts_5));
+        contacts.add(new Contact(getString(R.string.nickname1), R.drawable.contacts_1));
+        contacts.add(new Contact(getString(R.string.nickname2), R.drawable.contacts_2));
+        contacts.add(new Contact(getString(R.string.nickname3), R.drawable.contacts_3));
+        contacts.add(new Contact(getString(R.string.nickname4), R.drawable.contacts_4));
+        contacts.add(new Contact(getString(R.string.nickname5), R.drawable.contacts_5));
         recyclerView.setAdapter(new ContactAdapter(contacts));
     }
 

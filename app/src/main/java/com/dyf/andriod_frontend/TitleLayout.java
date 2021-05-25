@@ -45,7 +45,10 @@ public class TitleLayout extends LinearLayout {
                     activity.onBackPressed();
                 }
                 TextView title = activity.findViewById(R.id.title_text);
-                title.setText("Instant Message");
+                if(title.getText().toString().equals(context.getString(R.string.nickname1)) || title.getText().toString().equals(context.getString(R.string.nickname2))  || title.getText().toString().equals(context.getString(R.string.nickname3))  || title.getText().toString().equals(context.getString(R.string.nickname4))  || title.getText().toString().equals(context.getString(R.string.nickname5)))
+                {
+                    title.setText("聊天");
+                }
                 titleBack.setVisibility(GONE);
                 Button title_back_2 = activity.findViewById(R.id.title_back2);
                 title_back_2.setVisibility(GONE);
