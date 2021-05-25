@@ -38,6 +38,57 @@
 
     <string name="test_moment_time">4小时前</string>
     <string name="test_moment_content">虽然和常规的加载图片的方式没什么区别，但需要注意的是，在ListView中我们一般会需要复用布局的View来创造更快更平滑的用户体验。此处Glide会自动取消图片的请求，清除图片复用，加载正确合适的图片显示ImageView上。</string>
+
+    <string name="discover">Discover</string>
+    <string name="setting_me">Me</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="setting_text">Settings Page</string>
+
+
+    <!-- 可以使用的昵称信息 -->
+
+    <string name="nickname1">陈诗瑶</string>
+    <string name="nickname2">董诗琪</string>
+    <string name="nickname3">孙宇红</string>
+    <string name="nickname4">陈凌霄</string>
+    <string name="nickname5">郭建敏</string>
+    <string name="nickname6">丁一峰</string>
+    <string name="nickname7">旗平青</string>
+    <string name="nickname8">盈小真</string>
+    <string name="nickname9">敖觅珍</string>
+    <string name="nickname10">陈绿蕊</string>
+    <string name="nickname11">南门恨竹</string>
+    <string name="nickname12">张简春桃</string>
+
+    <!-- Mock生成的随机中文字符串 -->
+
+    <string name="sentence1"> 里表东两白美它林斯满六。 </string>
+    <string name="sentence2"> 收程究油有向金产文。 </string>
+    <string name="sentence3"> 干严面里办及精响看方空际新事。 </string>
+    <string name="sentence4"> 军八步么车式需存局米完。 </string>
+    <string name="sentence5"> 提报那把说院明经面我务三你维算。 </string>
+    <string name="sentence6"> 包断千代局实布住合业作高。 </string>
+    <string name="sentence7"> 确用矿称料以己上料教群感。 </string>
+    <string name="sentence8"> 无拉快多但力取三于。 </string>
+    <string name="sentence9"> 周车看真太规列究结此机制个广。 </string>
+    <string name="sentence10"> 法东制打法立生号从式它件质。 </string>
+    <string name="sentence11"> 状拉等确式构万十八率。 </string>
+    <string name="sentence12"> 周场原何究展眼题器工同。 </string>
+
+
+    <!-- Mock生成的随机中文字符串，可用于发现页 -->
+    <string name="paragraph1"> 问具各并料感发适组米习后。头党内情例造应知代改六整已入方放。五能东斗单作红身思边毛越它。 </string>
+    <string name="paragraph2"> 图准政布算现不素月从号文儿确路京资但。快出特天已包员比东确越口史安干此。五即设说马外连内采质广力。 </string>
+    <string name="paragraph3"> 第率长情部到头众金流列满照参内地东。究容治好将一阶活流性才接。非选什声建节第联构称史因体问府传持。 </string>
+    <string name="paragraph4"> 音参可一存问接日相书道众百基存。专半状复可人头定速五期便县列西。现共高今得加今广众计事条。 </string>
+    <string name="paragraph5"> 分同那务行油子做传使存片济本书类花。共土次五气或府做世代关什角。但压何并电例较家到上低产存确准山物。 </string>
+    <string name="paragraph6"> 际正包深五图知应选王适段标复山应。王据下离观热情造两世多心。两油想也济什结转称般身思系元共百织。 </string>
+    <string name="paragraph7"> 转政料出音之已准高各行物事火值成状务。件因流实层命都于同党厂每点。般因极里众地要使被革增越。 </string>
+    <string name="paragraph8"> 道明图候值内素斗光调七划那飞。她较身产同九党南易五了利热身。象界白值况题满七文住流题之从车。 </string>
+    <string name="paragraph9"> 进际因许影受干克压高百交值备音动花车。认收很外日周却机查并引机需立然验区。十里具四认风目标商入听六二放着关。 </string>
+    <string name="paragraph10"> 商称采形象资去书己适家前料者所。队则称向七社间可起必使知安布安农向。需增林日眼做到内目劳许志较边术长表。 </string>
+    <string name="paragraph11"> 安情资好社王装信权后机感义后千土。管不就常科铁量不进交压新感。选两内平真存须维他带说七。 </string>
+    <string name="paragraph12"> 斗变克道我温级率同八做想原切。运它别大把西到位收边许快连与称华。何维价见史特但流世少装油教面。 </string>
     <string name="test_image_url_1">http://8.140.133.34:7423/media/image.jpg</string>
     <string name="test_image_url_2">http://8.140.133.34:7423/media/image.jpg</string>
 

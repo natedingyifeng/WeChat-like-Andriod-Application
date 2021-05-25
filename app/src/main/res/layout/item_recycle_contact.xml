@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:orientation="horizontal"
+    android:paddingTop="15dp"
+    android:paddingEnd="10dp">
+
+    <ImageView
+        android:id="@+id/contact_avatar_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/app_name"
+        android:paddingLeft="15dp"
+        android:src="@drawable/avatar1" />
+
+    <TextView
+        android:id="@+id/contact_nickname_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:paddingStart="13dp"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
+
+</LinearLayout>
