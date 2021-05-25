@@ -22,7 +22,7 @@ import okhttp3.ResponseBody;
 
 public class HttpRequest {
 //    private static final String urlStr = "http://8.140.133.34:7421/";
-    private static final String server_url = "http://183.172.184.86:7000/";
+    private static final String server_url = "http://183.172.190.117:7000/";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private static final OkHttpClient client = new OkHttpClient();
 
