@@ -1,6 +1,8 @@
 package com.dyf.andriod_frontend;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
@@ -56,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.password_edit_text);
         imageView = findViewById(R.id.imageView);
 
-        Glide.with(this).load("http://183.172.184.164:7001/media/image.jpg").into(imageView);
+        Glide.with(this).load("http://8.140.133.34:7423/media/image.jpg").into(imageView);
 
 
 
@@ -86,10 +88,9 @@ public class LoginActivity extends AppCompatActivity {
         HttpRequest.sendOkHttpPostRequest("user/login", new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(),"登陆失败", Toast.LENGTH_SHORT).show();
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
             }
 
             @Override
@@ -99,9 +100,13 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if (jsonObject.getBoolean("success")){
+                        // 将用户数据存入本地
+                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("username", username);
+                        editor.commit();
                         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                         startActivity(intent);
-                        Toast.makeText(getApplicationContext(),"登陆成功", Toast.LENGTH_SHORT).show();
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),R.string.username_or_password_error, Toast.LENGTH_SHORT).show();

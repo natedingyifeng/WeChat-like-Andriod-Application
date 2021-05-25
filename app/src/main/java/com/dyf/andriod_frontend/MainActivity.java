@@ -19,6 +19,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
+import android.os.Bundle;
+
+import com.dyf.andriod_frontend.moments.MomentsFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity  {
 
     @BindView(R.id.bottomNavigationView)
@@ -39,6 +49,8 @@ public class MainActivity extends AppCompatActivity  {
         ListFragment chatsFragment = new ChatsFragment();
 //        Fragment messagesFragment = new MessagesFragment();
         Fragment contactsFragment = new ContactsFragment();
+        Fragment settingsFragment = new SettingsFragment();
+        Fragment momentsFragment = new MomentsFragment();
 //        Fragment discoverFragment = new DiscoverFragment();
 //        Fragment settingsFragment = new SettingsFragment();
 
@@ -54,12 +66,12 @@ public class MainActivity extends AppCompatActivity  {
                         case R.id.contacts:
                             setCurrentFragment(contactsFragment);
                             return true;
-//                        case R.id.discover:
-//                            setCurrentFragment(discoverFragment);
-//                            return true;
-//                        case R.id.settings:
-//                            setCurrentFragment(settingsFragment);
-//                            return true;
+                        case R.id.moments:
+                            setCurrentFragment(momentsFragment);
+                            return true;
+                        case R.id.settings:
+                            setCurrentFragment(settingsFragment);
+                            return true;
                     }
                     return false;
                 }
@@ -78,13 +90,15 @@ public class MainActivity extends AppCompatActivity  {
 //        WebSocket.initSocket();
 
 //        Log.d("position", "String.valueOf(position)");
-    }
 
-    private void setCurrentListFragment(ListFragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, fragment).commit();
+
     }
 
     private void setCurrentFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, fragment).commit();
+    }
+
+    private void setCurrentListFragment(ListFragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, fragment).commit();
     }
 }
