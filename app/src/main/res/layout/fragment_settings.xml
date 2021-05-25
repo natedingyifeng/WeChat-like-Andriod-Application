@@ -71,29 +71,34 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/slogan"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:layout_marginRight="20dp"/>
 
                 <TextView
                     android:id="@+id/settings_slogan_text_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:id="@+id/settings_text_view2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/phone_number"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:layout_marginRight="20dp"/>
 
                 <TextView
                     android:id="@+id/settings_phone_number_text_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
             </TableRow>
 
             <TableRow
@@ -109,7 +114,8 @@
             android:id="@+id/settings_modify_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/modify_info"
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 
 </FrameLayout>

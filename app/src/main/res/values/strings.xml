@@ -98,4 +98,5 @@
     <!-- Settings -->
     <string name="slogan">个性签名</string>
     <string name="phone_number">电话号码</string>
+    <string name="modify_info">修改信息</string>
 </resources>

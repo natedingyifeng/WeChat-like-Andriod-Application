@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.w3c.dom.Text;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SettingsFragment#newInstance} factory method to
@@ -47,6 +49,8 @@ public class SettingsFragment extends Fragment {
         ImageView avatarView = view.findViewById(R.id.settings_avatar_image_view);
         TextView nicknameView = view.findViewById(R.id.settings_nickname_text_view);
         TextView usernameView = view.findViewById(R.id.settings_username_text_view);
+        TextView sloganView = view.findViewById(R.id.settings_slogan_text_view);
+        TextView phoneNumberView = view.findViewById(R.id.settings_phone_number_text_view);
 
         Glide.with(this).load(getString(R.string.test_user_avatar_url)).into(avatarView);
         SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
@@ -55,6 +59,8 @@ public class SettingsFragment extends Fragment {
         nicknameView.setText(nickname);
         usernameView.setText(username);
 
+        sloganView.setText(sp.getString("phoneNumber", "15808901623"));
+        phoneNumberView.setText(sp.getString("slogan", "为祖国健康工作五十年！"));
     }
 
     @Override
