@@ -38,7 +38,8 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        TextView title = getActivity().findViewById(R.id.title_text);
+        title.setText(R.string.settings);
     }
 
     @Override

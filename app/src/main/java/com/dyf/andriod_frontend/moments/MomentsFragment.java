@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.dyf.andriod_frontend.R;
 import com.dyf.andriod_frontend.user.User;
@@ -40,6 +41,8 @@ public class MomentsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TextView title = getActivity().findViewById(R.id.title_text);
+        title.setText(R.string.moments);
     }
 
     @Override

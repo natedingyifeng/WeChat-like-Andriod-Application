@@ -6,6 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.dyf.andriod_frontend.TitleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </com.dyf.andriod_frontend.TitleLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
