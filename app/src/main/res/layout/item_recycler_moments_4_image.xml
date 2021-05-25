@@ -52,6 +52,7 @@ android:orientation="horizontal">
             android:layout_rowWeight="1"
             android:layout_height="wrap_content"
             android:contentDescription="图片1"
+            android:scaleType="fitCenter"
             android:src="@drawable/image1"
             android:layout_margin="5dp"/>
         <ImageView
@@ -62,6 +63,7 @@ android:orientation="horizontal">
             android:layout_rowWeight="1"
             android:layout_height="wrap_content"
             android:contentDescription="图片2"
+            android:scaleType="fitCenter"
             android:src="@drawable/image2"
             android:layout_margin="5dp"/>
         <ImageView
@@ -72,6 +74,7 @@ android:orientation="horizontal">
             android:layout_rowWeight="1"
             android:layout_height="wrap_content"
             android:contentDescription="图片3"
+            android:scaleType="fitCenter"
             android:src="@drawable/image3"
             android:layout_margin="5dp"/>
         <ImageView
@@ -82,6 +85,7 @@ android:orientation="horizontal">
             android:layout_rowWeight="1"
             android:layout_height="wrap_content"
             android:contentDescription="图片4"
+            android:scaleType="fitCenter"
             android:src="@drawable/image4"
             android:layout_margin="5dp"/>
     </GridLayout>

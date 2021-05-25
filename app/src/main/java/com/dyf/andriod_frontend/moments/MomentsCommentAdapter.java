@@ -63,6 +63,11 @@ public class MomentsCommentAdapter extends RecyclerView.Adapter<MomentsCommentAd
         holder.contentView.setText(ssb);
     }
 
+    public void addData(int position, MomentsComment comment){
+        data.add(position, comment);
+        notifyItemInserted(position);
+    }
+
     @Override
     public long getItemId(int position) {
         return position;

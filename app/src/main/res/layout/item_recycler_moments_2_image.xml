@@ -51,6 +51,7 @@ android:orientation="horizontal">
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:contentDescription="图片1"
+            android:scaleType="fitCenter"
             android:src="@drawable/image1" />
 
         <ImageView
@@ -61,6 +62,7 @@ android:orientation="horizontal">
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:contentDescription="图片1"
+            android:scaleType="fitCenter"
             android:src="@drawable/image2" />
     </LinearLayout>
 

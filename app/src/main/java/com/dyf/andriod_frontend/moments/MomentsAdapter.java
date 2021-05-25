@@ -33,6 +33,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
     private Context context;
     private String username;
     private String nickname;
+    private MomentsCommentAdapter mca;
 
     public MomentsAdapter(LinkedList<Moment> moments, Context context) {this.moments = moments; this.context = context;}
 
@@ -76,6 +77,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             Glide
                     .with(context)
                     .load(images.get(i))
+                    .skipMemoryCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(holder.imageViews[i]);
         }
@@ -87,8 +89,8 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             holder.starBtn.setImageResource(android.R.drawable.star_big_on);
 
         LinkedList<MomentsComment> comments = moment.getComments();
-        MomentsCommentAdapter adapter = new MomentsCommentAdapter(comments, context);
-        holder.commentsRecyclerView.setAdapter(adapter);
+        mca = new MomentsCommentAdapter(comments, context);
+        holder.commentsRecyclerView.setAdapter(mca);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         holder.commentsRecyclerView.setLayoutManager(layoutManager);
 
@@ -165,9 +167,10 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             public void onClick(DialogInterface dialog, int which) {
                 inputServer.getText().toString();
                 MomentsComment comment = new MomentsComment(moments.get(position).getId(),inputServer.getText().toString(), new User(username, nickname), null);
-                LinkedList<MomentsComment> comments = moments.get(position).getComments();
-                comments.add(comment);
-                moments.get(position).setComments(comments);
+//                LinkedList<MomentsComment> comments = moments.get(position).getComments();
+//                comments.add(comment);
+//                moments.get(position).setComments(comments);
+                mca.addData(mca.getItemCount(), comment);
             }
         });
         builder.show();
