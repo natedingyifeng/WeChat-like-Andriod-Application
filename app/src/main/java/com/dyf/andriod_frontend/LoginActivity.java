@@ -1,6 +1,8 @@
 package com.dyf.andriod_frontend;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
@@ -87,7 +89,9 @@ public class LoginActivity extends AppCompatActivity {
         HttpRequest.sendOkHttpPostRequest("user/login", new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
             }
 
             @Override
@@ -97,6 +101,11 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if (jsonObject.getBoolean("success")){
+                        // 将用户数据存入本地
+                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("username", username);
+                        editor.commit();
                         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                         startActivity(intent);
                     }else{

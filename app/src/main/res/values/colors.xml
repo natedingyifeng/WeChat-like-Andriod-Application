@@ -7,5 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="blue_link">#0000FF</color>
+    <color name="blue_link">#0066FF</color>
+    <color name="blue_name">#FF0066FF</color>
+    <color name="gray_bg">#e9e9e9</color>
 </resources>

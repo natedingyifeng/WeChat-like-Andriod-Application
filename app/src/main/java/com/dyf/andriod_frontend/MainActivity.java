@@ -21,13 +21,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        Fragment settingsFragment = new SettingsFragment();
         Fragment momentsFragment = new MomentsFragment();
 
-        setCurrentFragment(momentsFragment);
+//        setCurrentFragment(momentsFragment);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.moments:
                     setCurrentFragment(momentsFragment);
+                    return true;
+                case R.id.settings:
+                    setCurrentFragment(settingsFragment);
                     return true;
             }
             return false;

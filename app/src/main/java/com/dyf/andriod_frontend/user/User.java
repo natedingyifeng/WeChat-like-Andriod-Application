@@ -13,6 +13,11 @@ public class User {
     private String userType;
     private String avatarUrl;
 
+    public User(String username, String nickname){
+        this.username = username;
+        this.nickname = nickname;
+    }
+
     public User(String id, String nickname, String username, String password, String phoneNumber, String slogan, String userType, String avatarUrl){
         this.id = id;
         this.nickname = nickname;
