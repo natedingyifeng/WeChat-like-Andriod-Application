@@ -1,6 +1,7 @@
 package com.dyf.andriod_frontend;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,8 +42,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TextView title = getActivity().findViewById(R.id.title_text);
-        title.setText(R.string.settings);
     }
 
     @Override
@@ -61,6 +61,15 @@ public class SettingsFragment extends Fragment {
 
         sloganView.setText(sp.getString("phoneNumber", "15808901623"));
         phoneNumberView.setText(sp.getString("slogan", "为祖国健康工作五十年！"));
+
+        Button image_icon = getActivity().findViewById(R.id.settings_modify_btn);
+        image_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), SettingsModifyActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

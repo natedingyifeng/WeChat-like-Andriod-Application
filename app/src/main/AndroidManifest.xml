@@ -33,6 +33,11 @@
             android:name=".RegisterActivity"
             android:label="@string/register_title">
         </activity>
+
+        <activity
+            android:name=".SettingsModifyActivity"
+            android:label="修改个人信息">
+        </activity>
     </application>
 
 </manifest>
