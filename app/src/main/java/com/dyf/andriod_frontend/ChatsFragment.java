@@ -22,6 +22,8 @@ import com.dyf.andriod_frontend.chat.Chat;
 import com.dyf.andriod_frontend.chat.ChatAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -78,6 +80,11 @@ public class ChatsFragment extends ListFragment {
         transaction.commit();
         TextView title = getActivity().findViewById(R.id.title_text);
         title.setText(data.get(position).getNickname());
+        data.get(position).setLastSpeak("hhh加油呀");
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
+        String createdate = sdf.format(date);
+        data.get(position).setLastSpeakTime(createdate);
 //        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) title.getLayoutParams();
 //        lp.setMargins(0,0,180, 0);
 //        title.setLayoutParams(lp);
