@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.R;
 //import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 
+import cn.jzvd.Jzvd;
 import cn.jzvd.JzvdStd;
 
 public class MessageAdapter extends BaseAdapter {
@@ -76,7 +80,10 @@ public class MessageAdapter extends BaseAdapter {
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             icon.setImageResource(messageA.getAvatarIcon());
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
-            content.setImageURI(messageA.getContentImage());
+            Glide
+                    .with(context)
+                    .load(messageA.getContentImage())
+                    .into(content);
             return convertView;
         }
         else if(messageA.getComponentType() == 3)
@@ -85,7 +92,22 @@ public class MessageAdapter extends BaseAdapter {
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             icon.setImageResource(messageA.getAvatarIcon());
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
-            content.setImageURI(messageA.getContentImage());
+            Glide
+                    .with(context)
+                    .load(messageA.getContentImage())
+                    .into(content);
+            return convertView;
+        }
+        else if(messageA.getComponentType() == 4)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_video_left, parent, false);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
+            icon.setImageResource(messageA.getAvatarIcon());
+            JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
+            videoView.setUp(messageA.getContentImage(), "视频", Jzvd.SCREEN_NORMAL);
+            Glide.with(context)
+                    .load(messageA.getContentImage())
+                    .into(videoView.posterImageView);
             return convertView;
         }
         else if(messageA.getComponentType() == 5)
@@ -94,9 +116,10 @@ public class MessageAdapter extends BaseAdapter {
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             icon.setImageResource(messageA.getAvatarIcon());
             JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
-            videoView.setUp(messageA.getVideoPath(), "Local Video");
-//            McoyVideoView videoView = (McoyVideoView) convertView.findViewById(R.id.videoView);
-//            videoView.setVideoUrl(getRealFilePath(context, message.getContentImage()));
+            videoView.setUp(messageA.getContentImage(), "视频", Jzvd.SCREEN_NORMAL);
+            Glide.with(context)
+                    .load(messageA.getContentImage())
+                    .into(videoView.posterImageView);
             return convertView;
         }
         else if(messageA.getComponentType() == 6)
@@ -110,7 +133,7 @@ public class MessageAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     if(mp.isPlaying() == false){
                         try {
-                            mp.setDataSource(messageA.getVideoPath());
+                            mp.setDataSource(messageA.getContentImage());
                             mp.prepare();
                             mp.start();
                         } catch (IOException e) {
@@ -136,7 +159,7 @@ public class MessageAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     if(mp.isPlaying() == false){
                         try {
-                            mp.setDataSource(messageA.getVideoPath());
+                            mp.setDataSource(messageA.getContent());
                             mp.prepare();
                             mp.start();
                         } catch (IOException e) {
