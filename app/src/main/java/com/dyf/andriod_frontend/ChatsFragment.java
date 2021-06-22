@@ -78,6 +78,7 @@ public class ChatsFragment extends ListFragment {
     private Handler handler;
     private Handler handler_chats;
     private Handler handler_group_chats;
+    private Handler handler_ws;
     public MainActivity mainActivity;
     private Context context;
 
@@ -165,9 +166,9 @@ public class ChatsFragment extends ListFragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Looper.prepare();
-                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
-                    Looper.loop();
+//                    Looper.prepare();
+//                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+//                    Looper.loop();
                 }
             }
         }, params);
@@ -239,9 +240,9 @@ public class ChatsFragment extends ListFragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Looper.prepare();
-                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
-                    Looper.loop();
+//                    Looper.prepare();
+//                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+//                    Looper.loop();
                 }
             }
         }, params);
@@ -272,9 +273,11 @@ public class ChatsFragment extends ListFragment {
                         JSONObject jsonObject = new JSONObject(resStr);
                         if (jsonObject.getBoolean("success")){
                             JSONArray messages = jsonObject.getJSONArray("messages");
-                            data.add(new Chat(talkToName_tem, R.drawable.contacts_1, messages.getJSONObject(messages.length()-1).getString("content"), formatTime(messages.getJSONObject(messages.length()-1).getString("createdAt")), talkToId_tem));
+                            if(messages.length()>0) {
+                                data.add(new Chat(talkToName_tem, R.drawable.contacts_1, messages.getJSONObject(messages.length() - 1).getString("content"), formatTime(messages.getJSONObject(messages.length() - 1).getString("createdAt")), talkToId_tem));
 //                            Log.d("messages", messages.toString());
-                            handler_chats.sendEmptyMessage(1);
+                                handler_chats.sendEmptyMessage(1);
+                            }
                         }else{
                             Looper.prepare();
                             Toast.makeText(getActivity().getApplicationContext(),"好友消息获取失败", Toast.LENGTH_SHORT).show();
@@ -283,9 +286,9 @@ public class ChatsFragment extends ListFragment {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Looper.prepare();
-                        Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
-                        Looper.loop();
+//                        Looper.prepare();
+//                        Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+//                        Looper.loop();
                     }
                 }
             }, params);
@@ -304,18 +307,27 @@ public class ChatsFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         // Notification
         mainActivity = (MainActivity ) getActivity();
-        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-        String username = sp.getString("username", "");
-        String password = sp.getString("password", "");
-        JSONObject ws_msg_login = new JSONObject();
-        try {
-            ws_msg_login.put("bizType", "USER_LOGIN");
-            ws_msg_login.put("password", password);
-            ws_msg_login.put("username", username);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mainActivity.sendMsg(ws_msg_login.toString());
+//        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+//        String username = sp.getString("username", "");
+//        String password = sp.getString("password", "");
+//        JSONObject ws_msg_login = new JSONObject();
+//        try {
+//            ws_msg_login.put("bizType", "USER_LOGIN");
+//            ws_msg_login.put("password", password);
+//            ws_msg_login.put("username", username);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        mainActivity.sendMsg(ws_msg_login.toString());
+//        handler_ws.sendEmptyMessage(1);
+//
+//        handler_ws = new Handler(){
+//            @SuppressLint("HandlerLeak")
+//            public void handleMessage(Message msg){
+//                super.handleMessage(msg);
+//                getGroupChats();
+//            }
+//        };
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         MessagesFragment messagesFragment = new MessagesFragment();
