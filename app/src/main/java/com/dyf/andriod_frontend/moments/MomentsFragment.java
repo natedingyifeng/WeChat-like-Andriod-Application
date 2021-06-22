@@ -1,10 +1,7 @@
 package com.dyf.andriod_frontend.moments;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,17 +19,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dyf.andriod_frontend.LoginActivity;
-import com.dyf.andriod_frontend.MainActivity;
 import com.dyf.andriod_frontend.R;
-import com.dyf.andriod_frontend.SettingsModifyActivity;
-import com.dyf.andriod_frontend.user.User;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
