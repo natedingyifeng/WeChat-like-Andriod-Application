@@ -22,7 +22,7 @@
 
     <application
         android:allowBackup="true"
-        android:hardwareAccelerated="false"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -31,7 +31,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Andriod_frontend">
-        <activity android:name=".Setting.SettingsPasswordModifyActivity"></activity>
+        <activity android:name=".moments.MomentsVideoReleaseActivity"></activity>
+        <activity android:name=".user.UserInfoActivity" />
+        <activity android:name=".Setting.SettingsPasswordModifyActivity" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
@@ -58,13 +60,14 @@
             android:label="@string/register_title" />
         <activity
             android:name=".Setting.SettingsModifyActivity"
-            android:label="修改个人信息"></activity>
+            android:label="修改个人信息" />
+        <activity android:name=".NotificationActivity" />
         <activity android:name=".NotificationActivity" />
 
-        <activity android:name=".NotificationActivity"></activity>
-        <service android:name=".WebSocketService"
+        <service
+            android:name=".WebSocketService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
         <service
             android:name=".WebSocketService$GrayInnerService"
             android:enabled="true"
@@ -73,7 +76,7 @@
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote"></service>
+            android:process=":remote" />
     </application>
 
 </manifest>

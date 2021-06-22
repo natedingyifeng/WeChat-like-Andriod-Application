@@ -70,6 +70,8 @@ public class Moment {
     }
 
     public int getImageCount(){
+        if(postType.equals("VIDEO"))
+            return imagesUrl.size() - 2;
         return imagesUrl.size();
     }
 

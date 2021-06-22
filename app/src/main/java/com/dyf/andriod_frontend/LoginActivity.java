@@ -174,6 +174,12 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("avatarUrl", user.getString("avatarUrl"));
                         editor.putString("nickname", user.getString("nickname"));
                         editor.putString("id", user.getString("id"));
+                        if(user.has("slogan")){
+                            editor.putString("slogan", user.getString("slogan"));
+                        }
+                        if(user.has("phoneNumber")){
+                            editor.putString("phoneNumber", user.getString("phoneNumber"));
+                        }
                         editor.apply();
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"用户信息获取成功", Toast.LENGTH_SHORT).show();

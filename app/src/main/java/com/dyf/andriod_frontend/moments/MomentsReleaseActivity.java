@@ -68,11 +68,15 @@ public class MomentsReleaseActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        TextView title = findViewById(R.id.title_text);
+        title.setText("发布动态");
+        Button titleBack2 = findViewById(R.id.title_back2);
+        titleBack2.setVisibility(View.INVISIBLE);
         Button titleBack = (Button) findViewById(R.id.title_back);
         titleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                MomentsReleaseActivity.this.finish();
             }
         });
 
@@ -203,6 +207,9 @@ public class MomentsReleaseActivity extends AppCompatActivity {
     private void getPicture(){
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, IMAGE_REQUEST_CODE);
+
+//        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+//        startActivityForResult(intent, IMAGE_REQUEST_CODE);
     }
 
     @Override
@@ -296,11 +303,14 @@ public class MomentsReleaseActivity extends AppCompatActivity {
                     if (jsonObject.getBoolean("success")){
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(), "发布成功", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        MomentsReleaseActivity.this.finish();
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"发布错误", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
                     }
-                    Looper.loop();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Looper.prepare();

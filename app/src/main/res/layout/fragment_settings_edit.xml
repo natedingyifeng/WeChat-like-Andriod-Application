@@ -6,16 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".Setting.SettingsFragment">
 
+    <com.dyf.andriod_frontend.TitleLayout
+        android:id="@+id/titleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+    </com.dyf.andriod_frontend.TitleLayout>
+
     <ImageView
         android:id="@+id/settings_bg_image_view"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:background="#673AB7" />
+        android:layout_marginTop="50dp"
+        android:background="@color/gray_title" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="50dp">
 
         <ImageView
             android:id="@+id/settings_avatar_image_view"
@@ -38,7 +48,7 @@
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:text="TextView"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/black"
                 android:textSize="24sp" />
 
             <TextView
@@ -55,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="558dp"
         android:orientation="vertical"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="220dp"
         android:padding="40dp">
 
         <TableLayout

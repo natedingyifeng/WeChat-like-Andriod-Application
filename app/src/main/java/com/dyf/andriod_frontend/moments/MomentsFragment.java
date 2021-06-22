@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -46,13 +48,17 @@ import okhttp3.Response;
  */
 public class MomentsFragment extends Fragment {
 
+    private String LOG_TAG = "MomentsFragment";
+
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private static final int pageSize = 5;
     private int pageNum = 0;
 
     private LinkedList<Moment> moments;
 
     private Handler handler;
+    private boolean isLoading;
 
     LinearLayoutManager layoutManager;
     MomentsAdapter momentsAdapter;
@@ -89,46 +95,73 @@ public class MomentsFragment extends Fragment {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent;
                         switch(item.getItemId()) {
                             case R.id.picture_moment_release_btn:
-                                Intent intent = new Intent(getActivity(), MomentsReleaseActivity.class);
+                                intent = new Intent(getActivity(), MomentsReleaseActivity.class);
                                 startActivity(intent);
                                 break;
                             case R.id.video_moment_release_btn:
-
+                                intent = new Intent(getActivity(), MomentsVideoReleaseActivity.class);
+                                startActivity(intent);
                                 break;
                         }
                         return false;
                     }
                 });
                 popupMenu.show();
-                Intent intent = new Intent(getActivity(), MomentsReleaseActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), MomentsReleaseActivity.class);
+//                startActivity(intent);
             }
         });
 
+        // 下拉刷新
         recyclerView = view.findViewById(R.id.moments_recycler_view);
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                int last = layoutManager.findLastVisibleItemPosition();
+//                int first = layoutManager.findFirstVisibleItemPosition();
+//                int sum = momentsAdapter.getItemCount();
+//                if(newState == RecyclerView.SCROLL_STATE_SETTLING && last + 1 == sum){
+//                    if(!isFreshing){
+//                        isFreshing = true;
+//                        pageNum++;
+//                        try {
+//                            getMoments();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }else if(newState == RecyclerView.SCROLL_STATE_SETTLING && first == 0){
+//                    if(!isFreshing){
+//                        isFreshing = true;
+//                        pageNum = 0;
+//                        try {
+//                            getMoments();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//        });
+//        Context context = getActivity();
+        swipeRefreshLayout = view.findViewById(R.id.moments_refresh_layout);
+        handleDownPullUpdate();
+        swipeRefreshLayout.setRefreshing(true);
+
+        // 触底刷新
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
                 int last = layoutManager.findLastVisibleItemPosition();
-                int first = layoutManager.findFirstVisibleItemPosition();
-                int sum = momentsAdapter.getItemCount();
-                if(newState == RecyclerView.SCROLL_STATE_SETTLING && last + 1 == sum){
-                    if(!isFreshing){
-                        isFreshing = true;
+                if(last == moments.size() - 1 && !isLoading && (newState == RecyclerView.SCROLL_STATE_IDLE || newState == RecyclerView.SCROLL_STATE_SETTLING)){
+                    Log.e(LOG_TAG, "触底");
+                    isLoading = true;
+                    if(moments.size() % 5 == 0){
                         pageNum++;
-                        try {
-                            getMoments();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }else if(newState == RecyclerView.SCROLL_STATE_SETTLING && first == 0){
-                    if(!isFreshing){
-                        isFreshing = true;
-                        pageNum = 0;
                         try {
                             getMoments();
                         } catch (IOException e) {
@@ -138,7 +171,7 @@ public class MomentsFragment extends Fragment {
                 }
             }
         });
-//        Context context = getActivity();
+
         moments = new LinkedList<>();
 
         handler = new Handler(){
@@ -147,6 +180,7 @@ public class MomentsFragment extends Fragment {
                 super.handleMessage(msg);
                 if(pageNum == 0)
                     setData();
+                else appendData();
             }
         };
 
@@ -159,16 +193,16 @@ public class MomentsFragment extends Fragment {
     }
 
     private void setData(){
-        momentsAdapter = new MomentsAdapter(moments, getContext());
+        momentsAdapter = new MomentsAdapter(moments, getContext(), getActivity().getWindow());
         momentsAdapter.setHasStableIds(true);
         recyclerView.setAdapter(momentsAdapter);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        isFreshing = false;
+        isLoading = false;
     }
 
     private void appendData(){
-
+        momentsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -210,6 +244,8 @@ public class MomentsFragment extends Fragment {
                             moments.add(new Moment(item));
                         }
                         handler.sendEmptyMessage(1);
+                        swipeRefreshLayout.setRefreshing(false);
+                        isLoading = false;
                     }else{
                         Looper.prepare();
                         Toast.makeText(getContext(),R.string.username_or_password_error, Toast.LENGTH_SHORT).show();
@@ -226,5 +262,21 @@ public class MomentsFragment extends Fragment {
 
     }
 
+    // 实现下拉刷新
+    private void handleDownPullUpdate(){
+        swipeRefreshLayout.setEnabled(true);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pageNum = 0;
+                isLoading = true;
+                try {
+                    getMoments();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
 }

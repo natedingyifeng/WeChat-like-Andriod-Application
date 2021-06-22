@@ -10,4 +10,5 @@
     <color name="blue_link">#0066FF</color>
     <color name="blue_name">#FF0066FF</color>
     <color name="gray_bg">#e9e9e9</color>
+    <color name="gray_title">#E4E4E4</color>
 </resources>

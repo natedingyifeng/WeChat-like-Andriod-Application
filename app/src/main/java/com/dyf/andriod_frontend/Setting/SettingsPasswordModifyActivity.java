@@ -10,9 +10,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.moments.MomentsReleaseActivity;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,23 @@ public class SettingsPasswordModifyActivity extends AppCompatActivity {
         passwordPreEdit = findViewById(R.id.password_previous_edit);
         btn = findViewById(R.id.password_edit_upload_btn);
 
+        // 设置标题栏
+        if(getSupportActionBar()!= null){
+            getSupportActionBar().hide();
+        }
+        TextView title = findViewById(R.id.title_text);
+        title.setText("修改密码");
+        Button titleBack2 = findViewById(R.id.title_back2);
+        titleBack2.setVisibility(View.INVISIBLE);
+        Button titleBack = (Button) findViewById(R.id.title_back);
+        titleBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsPasswordModifyActivity.this.finish();
+            }
+        });
+
+        //设置监听器
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,6 +101,7 @@ public class SettingsPasswordModifyActivity extends AppCompatActivity {
                                 Looper.prepare();
                                 Toast.makeText(getApplicationContext(),"修改成功", Toast.LENGTH_SHORT).show();
                                 Looper.loop();
+                                SettingsPasswordModifyActivity.this.finish();
 //                        Intent intent = new Intent(getApplicationContext(), SettingsFragment.class);
 //                        startActivity(intent);
 

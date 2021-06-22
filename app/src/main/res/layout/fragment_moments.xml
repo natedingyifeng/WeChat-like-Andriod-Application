@@ -10,13 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_marginTop="45dp">
+        android:layout_marginTop="60dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/moments_recycler_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never" />
+            android:id="@+id/moments_refresh_layout">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/moments_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 
