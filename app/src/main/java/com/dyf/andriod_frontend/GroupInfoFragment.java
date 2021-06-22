@@ -1,24 +1,18 @@
 package com.dyf.andriod_frontend;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -27,19 +21,32 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.dyf.andriod_frontend.groupInfo.GroupInfoAdapter;
 import com.dyf.andriod_frontend.groupInfo.groupInfo;
 import com.dyf.andriod_frontend.groupMemberIcons.Icons;
 import com.dyf.andriod_frontend.groupMemberIcons.IconsAdapter;
-import com.dyf.andriod_frontend.message.Message;
-import com.dyf.andriod_frontend.message.MessageAdapter;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import butterknife.BindView;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+import android.os.Handler;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,6 +62,8 @@ public class GroupInfoFragment extends Fragment {
     private ListView listView;
     private int chat_type;
     private String message_name;
+    private String group_id;
+    private Handler handler_group_chats;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
@@ -63,8 +72,8 @@ public class GroupInfoFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void saveMessageInfo(String name) {
-        this.message_name = name;
+    public void saveMessageInfo(String id) {
+        this.group_id = id;
     }
 
     /**
@@ -101,29 +110,67 @@ public class GroupInfoFragment extends Fragment {
         // data.add(new Chat(getString(R.string.nickname2), R.drawable.avatar2, getString(R.string.sentence2), "2021/01/01"));
         // TODO
         data_icons = new LinkedList<>();
-        data_icons.add(new Icons(getString(R.string.nickname1), R.drawable.contacts_1));
-        data_icons.add(new Icons(getString(R.string.nickname2), R.drawable.contacts_2));
-        data_icons.add(new Icons(getString(R.string.nickname3), R.drawable.contacts_3));
-        data_icons.add(new Icons(getString(R.string.nickname4), R.drawable.contacts_4));
-        data_icons.add(new Icons(getString(R.string.nickname5), R.drawable.contacts_5));
-        data_icons.add(new Icons(getString(R.string.nickname6), R.drawable.contacts_6));
-        data_icons.add(new Icons(getString(R.string.nickname1), R.drawable.contacts_1));
-        data_icons.add(new Icons(getString(R.string.nickname2), R.drawable.contacts_2));
-        data_icons.add(new Icons(getString(R.string.nickname3), R.drawable.contacts_3));
-        data_icons.add(new Icons(getString(R.string.nickname4), R.drawable.contacts_4));
-        data_icons.add(new Icons(getString(R.string.nickname5), R.drawable.contacts_5));
-        data_icons.add(new Icons(getString(R.string.nickname6), R.drawable.contacts_6));
-        data_icons.add(new Icons(getString(R.string.nickname4), R.drawable.contacts_4));
-        data_icons.add(new Icons(R.drawable.contacts_more, 1));
-        iconsAdapter = new IconsAdapter(data_icons, context);
-        recyclerView.setAdapter(iconsAdapter);
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 5);
-        recyclerView.setLayoutManager(layoutManager);
+
+        HashMap<String, String> params = new HashMap<>();
+
+        HttpRequest.sendOkHttpPostRequest("group/get", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")) {
+                        JSONArray groups = jsonObject.getJSONArray("groups");
+                        int index=0;
+                        for(int i=0;i<groups.length();i++) {
+                            if(groups.getJSONObject(i).getString("id").equals(group_id))
+                            {
+                                index = i;
+                            }
+                        }
+                        JSONArray groupMembers = groups.getJSONObject(index).getJSONArray("members");
+                        for(int j=0;j<groupMembers.length();j++)
+                        {
+                            data_icons.add(new Icons(groupMembers.getJSONObject(j).getString("username"), R.drawable.group_chat_avatar));
+                        }
+                        handler_group_chats.sendEmptyMessage(1);
+                    } else {
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), "群聊成员获取失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        handler_group_chats.sendEmptyMessage(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        }, params);
+
+        handler_group_chats = new Handler() {
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                data_icons.add(new Icons(R.drawable.contacts_more, 1));
+                iconsAdapter = new IconsAdapter(data_icons, context);
+                recyclerView.setAdapter(iconsAdapter);
+                GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 5);
+                recyclerView.setLayoutManager(layoutManager);
+            }
+        };
 
         data_groupInfos = new LinkedList<>();
-        data_groupInfos.add(new groupInfo("群聊名称"));
-        data_groupInfos.add(new groupInfo("群聊头像"));
-        data_groupInfos.add(new groupInfo("查找聊天内容"));
+//        data_groupInfos.add(new groupInfo("查找聊天内容"));
         groupInfoAdapter = new GroupInfoAdapter(data_groupInfos, context);
         listView.setAdapter(groupInfoAdapter);
 //        listView.setSelection(listView.getBottom());

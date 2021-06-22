@@ -12,6 +12,14 @@
         android:orientation="vertical"
         android:layout_marginTop="55dp">
 
+        <EditText
+            android:id="@+id/group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
+
         <LinearLayout
             android:id="@+id/linearLayoutMenu"
             android:layout_width="match_parent"

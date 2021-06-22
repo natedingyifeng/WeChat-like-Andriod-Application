@@ -1,5 +1,6 @@
 package com.dyf.andriod_frontend;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,6 +18,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,23 +41,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dyf.andriod_frontend.contact.Contact;
 import com.dyf.andriod_frontend.contact.ContactAdapter;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.java_websocket.client.WebSocketClient;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import butterknife.BindView;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+import android.os.Handler;
 
 public class ContactsFragment extends ListFragment {
     private ListView listView;
     private LinkedList<Contact> contacts;
     public MainActivity mainActivity;
     public String id;
+    private Handler handler;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
@@ -159,14 +174,58 @@ public class ContactsFragment extends ListFragment {
         bottomNavigationView.setVisibility(View.VISIBLE);
         Context context = getActivity();
         contacts = new LinkedList<>();
-        contacts.add(new Contact("添加朋友", R.drawable.add_friends, 1));
-        contacts.add(new Contact("发起群聊", R.drawable.group_chat, 2));
-        contacts.add(new Contact(getString(R.string.nickname1), R.drawable.contacts_1, 0));
-        contacts.add(new Contact(getString(R.string.nickname2), R.drawable.contacts_2, 0));
-        contacts.add(new Contact(getString(R.string.nickname3), R.drawable.contacts_3, 0));
-        contacts.add(new Contact(getString(R.string.nickname4), R.drawable.contacts_4, 0));
-        contacts.add(new Contact(getString(R.string.nickname5), R.drawable.contacts_5, 0));
-        setListAdapter(new ContactAdapter(contacts, context));
+        contacts.add(new Contact("添加朋友", R.drawable.add_friends, 1, null));
+        contacts.add(new Contact("发起群聊", R.drawable.group_chat, 2, null));
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("keyword", username);
+
+        HttpRequest.sendOkHttpPostRequest("user/search", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        // 获取用户数据
+                        JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
+                        JSONArray friends =user.getJSONArray("contacts");
+                        Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
+                        for (int i = 0; i < friends.length(); i++)
+                        {
+                            contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                        }
+                        handler.sendEmptyMessage(1);
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"好友列表获取失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        handler.sendEmptyMessage(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        }, params);
+
+        handler = new Handler(){
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                setListAdapter(new ContactAdapter(contacts, context));
+            }
+        };
     }
 
     @Override
@@ -182,7 +241,7 @@ public class ContactsFragment extends ListFragment {
         {
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             MessagesFragment messagesFragment = new MessagesFragment();
-            messagesFragment.setChatType(0);
+            messagesFragment.setInfo(0, contacts.get(position).getId(), contacts.get(position).getNickname());
             transaction.replace(R.id.flFragment, messagesFragment);
             transaction.addToBackStack(null);
             transaction.commit();
@@ -196,15 +255,15 @@ public class ContactsFragment extends ListFragment {
             transaction.replace(R.id.flFragment, addfriendFragment);
             transaction.addToBackStack(null);
             transaction.commit();
-            JSONObject ws_msg_FriendRequestReply = new JSONObject();
-            try {
-                ws_msg_FriendRequestReply.put("bizType", "FRIEND_REQUEST_REPLY");
-                ws_msg_FriendRequestReply.put("agree", true);
-                ws_msg_FriendRequestReply.put("replyToUserId", this.id);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            mainActivity.sendMsg(ws_msg_FriendRequestReply.toString());
+//            JSONObject ws_msg_FriendRequestReply = new JSONObject();
+//            try {
+//                ws_msg_FriendRequestReply.put("bizType", "FRIEND_REQUEST_REPLY");
+//                ws_msg_FriendRequestReply.put("agree", true);
+//                ws_msg_FriendRequestReply.put("replyToUserId", this.id);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            mainActivity.sendMsg(ws_msg_FriendRequestReply.toString());
         }
         else if(contacts.get(position).getType() == 2)
         {
