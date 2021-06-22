@@ -8,7 +8,8 @@
 
     <com.dyf.andriod_frontend.TitleLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
 
     </com.dyf.andriod_frontend.TitleLayout>
 

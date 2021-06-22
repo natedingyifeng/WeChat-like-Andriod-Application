@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,14 +22,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.dyf.andriod_frontend.R;
 import com.dyf.andriod_frontend.user.User;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Comment;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsViewHolder> {
     private LinkedList<Moment> moments;
@@ -64,10 +76,13 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
 
     @Override
     public void onBindViewHolder(@NonNull MomentsViewHolder holder, int position) {
-        holder.setIsRecyclable(false);// 禁止复用
+//        holder.setIsRecyclable(false);// 禁止复用
         Moment moment = moments.get(position);
         int type = getItemViewType(position);
-        Glide.with(context).load(moment.getMomentsOwner().getAvatarUrl()).into(holder.avatarImage);
+        Glide.with(context)
+                .load(moment.getMomentsOwner().getAvatarUrl())
+                .thumbnail( 0.1f )
+                .into(holder.avatarImage);
         holder.nickname.setText(moment.getMomentsOwner().getNickname());
         holder.time.setText(moment.getCreatedAt());
         holder.content.setText(moment.getContent());
@@ -78,8 +93,10 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             Glide
                     .with(context)
                     .load(images.get(i))
-                    .skipMemoryCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                    .skipMemoryCache(true)
+//                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .thumbnail(0.2f)
+                    .override(200,200)
                     .into(holder.imageViews[i]);
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.store), Context.MODE_PRIVATE);
@@ -135,15 +152,80 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 }
             }
             moments.get(position).setLikedUsers(likedUser);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("postId", moments.get(position).getId());
+            HttpRequest.sendOkHttpPostRequest("post/unlike", new okhttp3.Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Looper.prepare();
+                    Toast.makeText(context,R.string.network_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    String resStr = response.body().string();
+                    Log.e("response", resStr);
+                    try {
+                        JSONObject jsonObject = new JSONObject(resStr);
+                        if (jsonObject.getBoolean("success")){
+                            Looper.prepare();
+                            Toast.makeText(context, "取消点赞成功", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Looper.prepare();
+                            Toast.makeText(context,"取消点赞失败", Toast.LENGTH_SHORT).show();
+                        }
+                        Looper.loop();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(context,R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }
+            }, params);
         }
         else {
             holder.starBtn.setImageResource(android.R.drawable.star_big_on);
             ArrayList<User> likedUser = moments.get(position).getLikedUsers();
             likedUser.add(new User(username, nickname));
             moments.get(position).setLikedUsers(likedUser);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("postId", moments.get(position).getId());
+            HttpRequest.sendOkHttpPostRequest("post/like", new okhttp3.Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Looper.prepare();
+                    Toast.makeText(context,R.string.network_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    String resStr = response.body().string();
+                    Log.e("response", resStr);
+                    try {
+                        JSONObject jsonObject = new JSONObject(resStr);
+                        if (jsonObject.getBoolean("success")){
+                            Looper.prepare();
+                            Toast.makeText(context, "点赞成功", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Looper.prepare();
+                            Toast.makeText(context,"点赞失败", Toast.LENGTH_SHORT).show();
+                        }
+                        Looper.loop();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(context,R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }
+            }, params);
         }
         holder.likedUserText.setText(getLikedUserString(position));
-        // TODO 发送请求
+
+
 
     }
 
@@ -178,7 +260,40 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 moments.get(position).getComments().add(comment);
                 mca.notifyDataSetChanged();
                 notifyDataSetChanged();
-//                mca.addData(comment);
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("content", inputServer.getText().toString());
+                params.put("postId", moments.get(position).getId());
+                params.put("talkToUserId", moments.get(position).getMomentsOwner().getId());
+                HttpRequest.sendOkHttpPostRequest("post/comment", new okhttp3.Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        Looper.prepare();
+                        Toast.makeText(context,R.string.network_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        String resStr = response.body().string();
+                        Log.e("response", resStr);
+                        try {
+                            JSONObject jsonObject = new JSONObject(resStr);
+                            if (jsonObject.getBoolean("success")){
+                                Looper.prepare();
+                                Toast.makeText(context, "评论成功", Toast.LENGTH_SHORT).show();
+                            }else{
+                                Looper.prepare();
+                                Toast.makeText(context,"评论失败", Toast.LENGTH_SHORT).show();
+                            }
+                            Looper.loop();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Looper.prepare();
+                            Toast.makeText(context,R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+                    }
+                }, params);
             }
         });
         builder.show();

@@ -19,6 +19,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 
 import butterknife.BindView;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity  {
     public BottomNavigationView bottomNavigationView;
 
     public static Handler msgHandler;
+    private HttpResponseCache MultiDex;
 
     private WebSocketClient client;
     private WebSocketService.MyWebSocketClientBinder binder;
@@ -231,7 +233,19 @@ public class MainActivity extends AppCompatActivity  {
             }
         }, params);
 
-//        Log.d("position", "String.valueOf(position)");
+//        // 消息处理
+//        msgHandler = new Handler() {
+//            @Override
+//            public void handleMessage(Message msg) {
+//                super.handleMessage(msg);
+//                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_LONG).show();
+//            }
+//        };
+
+        // 初始化websocket
+//        WebSocket.initSocket();
+
+        Log.d("position", "String.valueOf(position)");
 
 
     }

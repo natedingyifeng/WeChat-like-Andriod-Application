@@ -1,5 +1,7 @@
 package com.dyf.andriod_frontend.user;
 
+import com.dyf.andriod_frontend.utils.HttpRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,11 +35,17 @@ public class User {
         this.id = jsonObject.getString("id");
         this.nickname = jsonObject.getString("nickname");
         this.username = jsonObject.getString("username");
-        this.password = jsonObject.getString("password");
-        this.phoneNumber = jsonObject.getString("phoneNumber");
-        this.slogan = jsonObject.getString("slogan");
-        this.userType = jsonObject.getString("userType");
-        this.avatarUrl = jsonObject.getString("avatarUrl");
+        this.avatarUrl = HttpRequest.media_url + jsonObject.getString("avatarUrl");
+
+        if(jsonObject.has("password"))
+            this.password = jsonObject.getString("password");
+        if(jsonObject.has("phoneNumber"))
+            this.phoneNumber = jsonObject.getString("phoneNumber");
+        if(jsonObject.has("slogan"))
+            this.slogan = jsonObject.getString("slogan");
+        if(jsonObject.has("userType"))
+            this.userType = jsonObject.getString("userType");
+
     }
 
     public String getId() {

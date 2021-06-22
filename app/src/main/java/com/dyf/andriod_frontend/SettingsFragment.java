@@ -59,8 +59,8 @@ public class SettingsFragment extends Fragment {
         nicknameView.setText(nickname);
         usernameView.setText(username);
 
-        sloganView.setText(sp.getString("phoneNumber", "15808901623"));
-        phoneNumberView.setText(sp.getString("slogan", "为祖国健康工作五十年！"));
+        phoneNumberView.setText(sp.getString("phoneNumber", "15808901623"));
+        sloganView.setText(sp.getString("slogan", "为祖国健康工作五十年！"));
 
         Button image_icon = getActivity().findViewById(R.id.settings_modify_btn);
         image_icon.setOnClickListener(new View.OnClickListener() {
