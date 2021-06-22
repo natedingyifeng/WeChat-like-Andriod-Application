@@ -7,21 +7,24 @@ public class Chat {
     private final int avatarIcon; // 头像
     private String lastSpeakTime; //最后联络时间
     private final int chatType;
+    private String id;
 
-    public Chat(String nickname, int avatarIcon, String lastSpeak, String lastSpeakTime) {
+    public Chat(String nickname, int avatarIcon, String lastSpeak, String lastSpeakTime, String id) {
         this.nickname = nickname;
         this.avatarIcon = avatarIcon;
         this.lastSpeak = lastSpeak;
         this.lastSpeakTime = lastSpeakTime;
         this.chatType = 0;
+        this.id = id;
     }
 
-    public Chat(String nickname, int avatarIcon, String lastSpeak, String lastSpeakTime, int chatType) {
+    public Chat(String nickname, int avatarIcon, String lastSpeak, String lastSpeakTime, int chatType, String id) {
         this.nickname = nickname;
         this.avatarIcon = avatarIcon;
         this.lastSpeak = lastSpeak;
         this.lastSpeakTime = lastSpeakTime;
         this.chatType = chatType;
+        this.id = id;
     }
 
     public int getAvatarIcon() {
@@ -45,4 +48,6 @@ public class Chat {
     public void setLastSpeak(String sen) { this.lastSpeak = sen; }
 
     public void setLastSpeakTime(String sen) { this.lastSpeakTime = sen; }
+
+    public String getId() { return this.id; }
 }

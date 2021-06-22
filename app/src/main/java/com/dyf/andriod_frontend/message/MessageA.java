@@ -3,7 +3,7 @@ package com.dyf.andriod_frontend.message;
 import android.net.Uri;
 import android.widget.ImageView;
 
-public class Message {
+public class MessageA {
 
     private final String content; //内容
     private final int avatarIcon; // 头像
@@ -11,7 +11,7 @@ public class Message {
     private final Uri content_image;
     private final String video_path;
 
-    public Message(String nickname, int avatarIcon, String content, int componentType) {
+    public MessageA(String nickname, int avatarIcon, String content, int componentType) {
         this.avatarIcon = avatarIcon;
         this.content = content;
         this.componentType = componentType;
@@ -19,7 +19,7 @@ public class Message {
         this.video_path = null;
     }
 
-    public Message(String nickname, int avatarIcon, int componentType, Uri content_image) {
+    public MessageA(String nickname, int avatarIcon, int componentType, Uri content_image) {
         this.avatarIcon = avatarIcon;
         this.content = "";
         this.componentType = componentType;
@@ -27,7 +27,7 @@ public class Message {
         this.video_path = null;
     }
 
-    public Message(String nickname, int avatarIcon, int componentType, String path) {
+    public MessageA(String nickname, int avatarIcon, int componentType, String path) {
         this.avatarIcon = avatarIcon;
         this.content = "";
         this.componentType = componentType;

@@ -2,22 +2,29 @@ package com.dyf.andriod_frontend;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaRecorder;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,7 +39,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
@@ -41,7 +47,6 @@ import androidx.fragment.app.Fragment;
 
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
@@ -51,20 +56,38 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-import com.dyf.andriod_frontend.message.Message;
+import com.dyf.andriod_frontend.message.MessageA;
 import com.dyf.andriod_frontend.message.MessageAdapter;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 //import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+import android.os.Handler;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -73,7 +96,7 @@ import androidx.fragment.app.FragmentTransaction;
  */
 public class MessagesFragment extends Fragment {
     private MessageAdapter messageAdapter;
-    private LinkedList<Message> data;
+    private LinkedList<MessageA> data;
     private ListView listView;
     private static final int TAKE_PHOTO_REQUEST_TWO = 444;
     private static final int TAKE_PHOTO_REQUEST_ONE = 333;
@@ -92,17 +115,166 @@ public class MessagesFragment extends Fragment {
     private MapView mapView;
     private BaiduMap baiduMap;
     private boolean isFirstLocate = true;
+    private String talkToId;
+    private String talkToName;
+    private Handler handler_chats;
+    private Handler handler_group_chats;
+    private Handler handler_images;
+    public MainActivity mainActivity;
+    private String filepath;
+    private String filename;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
+    private MessagesMessageReceiver messagesMessageReceiver;
+
+    private class MessagesMessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message=intent.getStringExtra("message");
+            try {
+                JSONArray json_contact = new JSONArray(message);
+//                Log.d("123", json_contact.toString());
+                if(chat_type == 0) {
+                    if (json_contact.getJSONObject(0).getString("messageType").equals("TEXT")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 0);
+                        data.add(new MessageA(talkToName, R.drawable.contacts_6, json_contact.getJSONObject(0).getString("content"), 0));
+                        messageAdapter.notifyDataSetChanged();
+                    }
+                }
+                else if(chat_type == 1)
+                {
+                    if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId))
+                    {
+                        data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, json_contact.getJSONObject(0).getString("content"), 0));
+                        messageAdapter.notifyDataSetChanged();
+                    }
+                }
+//                id = new String(json_contact.getJSONObject(0).getJSONObject("sentUser").get("id").toString());
+            } catch (JSONException e) {
+            }
+        }
+
+        private void sendNotificationOfNewMessage(String name, String Content, int type) {
+            Intent intent = new Intent(getContext(), NotificationActivity.class);
+            PendingIntent pi = PendingIntent.getActivities(getContext(), 0, new Intent[]{intent}, 0);
+            NotificationManager manager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
+            // 兼容  API 26，Android 8.0
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // 第三个参数表示通知的重要程度，默认则只在通知栏闪烁一下
+                NotificationChannel notificationChannel = new NotificationChannel("AppTestNotificationId", "AppTestNotificationName", NotificationManager.IMPORTANCE_HIGH);
+                notificationChannel.setShowBadge(true);
+                notificationChannel.enableVibration(true);
+                // 注册通道，注册后除非卸载再安装否则不改变
+                manager.createNotificationChannel(notificationChannel);
+            }
+            if(type==0) {
+                Notification notification = new Notification.Builder(getContext())
+                        .setContentTitle(name)
+                        .setContentText(Content)
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.mipmap.ic_play)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
+                        .setContentIntent(pi)
+                        .setAutoCancel(true) // 取消通知
+                        .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
+                        //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
+                        .setVibrate(new long[]{0, 1000, 1000, 1000})
+                        .setLights(Color.GREEN, 1000, 1000) // LED灯
+                        .setChannelId("AppTestNotificationId")
+                        //        .setLights(Color.GREEN, 1000, 1000)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build();
+                manager.notify(1, notification);
+            }
+            else if(type==1) {
+                Notification notification = new Notification.Builder(getContext())
+                        .setContentTitle(name)
+                        .setContentText("[图片]")
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.mipmap.ic_play)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
+                        .setContentIntent(pi)
+                        .setAutoCancel(true) // 取消通知
+                        .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
+                        //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
+                        .setVibrate(new long[]{0, 1000, 1000, 1000})
+                        .setLights(Color.GREEN, 1000, 1000) // LED灯
+                        .setChannelId("AppTestNotificationId")
+                        //        .setLights(Color.GREEN, 1000, 1000)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build();
+                manager.notify(1, notification);
+            }
+            else if(type==2) {
+                Notification notification = new Notification.Builder(getContext())
+                        .setContentTitle(name)
+                        .setContentText("[视频]")
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.mipmap.ic_play)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
+                        .setContentIntent(pi)
+                        .setAutoCancel(true) // 取消通知
+                        .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
+                        //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
+                        .setVibrate(new long[]{0, 1000, 1000, 1000})
+                        .setLights(Color.GREEN, 1000, 1000) // LED灯
+                        .setChannelId("AppTestNotificationId")
+                        //        .setLights(Color.GREEN, 1000, 1000)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build();
+                manager.notify(1, notification);
+            }
+            else if(type==3) {
+                Notification notification = new Notification.Builder(getContext())
+                        .setContentTitle(name)
+                        .setContentText("[位置]")
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.mipmap.ic_play)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
+                        .setContentIntent(pi)
+                        .setAutoCancel(true) // 取消通知
+                        .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
+                        //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
+                        .setVibrate(new long[]{0, 1000, 1000, 1000})
+                        .setLights(Color.GREEN, 1000, 1000) // LED灯
+                        .setChannelId("AppTestNotificationId")
+                        //        .setLights(Color.GREEN, 1000, 1000)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build();
+                manager.notify(1, notification);
+            }
+        }
+    }
+
+    private void doRegisterReceiver() {
+        messagesMessageReceiver = new MessagesMessageReceiver();
+        IntentFilter filter = new IntentFilter("com.dyf.servicecallback.content");
+        getActivity().registerReceiver(messagesMessageReceiver, filter);
+    }
 
     public MessagesFragment() {
         // Required empty public constructor
 //        chat_type = type;
     }
 
-    public void setChatType(int type) {
+    public void setInfo(int type, String id, String name) {
         this.chat_type = type;
+        this.talkToId = new String(id);
+        this.talkToName = new String(name);
     }
 
     /**
@@ -217,6 +389,8 @@ public class MessagesFragment extends Fragment {
 //        bottomNavigationView = (MainActivity) getActivity().getMenu();
 //        bottomNavigationView.animate().translationY(bottomNavigationView.getHeight());
 //        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        mainActivity = (MainActivity ) getActivity();
+        doRegisterReceiver();
         mLocationClient = new LocationClient(getActivity().getApplicationContext());
         mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getActivity().getApplicationContext());
@@ -253,49 +427,141 @@ public class MessagesFragment extends Fragment {
         title_back.setVisibility(View.VISIBLE);
         Button title_back_2 = getActivity().findViewById(R.id.title_back2);
         title_back_2.setVisibility(View.VISIBLE);
-        // 向ListView 添加数据，新建ChatAdapter，并向listView绑定该Adapter
-        // 添加数据的样例代码如下:
-        // data = new LinkedList<>();
-        // data.add(new Chat(getString(R.string.nickname1), R.drawable.avatar1, getString(R.string.sentence1), "2021/01/01"));
-        // data.add(new Chat(getString(R.string.nickname2), R.drawable.avatar2, getString(R.string.sentence2), "2021/01/01"));
-        // TODO
-        data = new LinkedList<>();
-        TextView title_text = getActivity().findViewById(R.id.title_text);
-        if(title_text.getText().toString().equals(getString(R.string.nickname1))) {
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "代码写不动", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "只好翻老照片刷朋友圈摸鱼", 1));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "patpat", 0));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "我这几天在写一个生信作业", 0));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "老师让我们复现一篇cell的图", 0));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "也是绝了", 0));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "哇 复现论文", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "好难呀", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "就是把他的数据重新处理一遍吗", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "但论文怎么会写数据处理的过程", 1));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "老师大致给了一个pipeline哈哈哈哈哈哈哈哈哈", 0));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "但是还是很恶心", 0));
-        }
-        else if(title_text.getText().toString().equals(getString(R.string.nickname2))) {
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "开始吗", 1));
-            data.add(new Message(getString(R.string.nickname2), R.drawable.contacts_2, "等一下", 0));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "ok", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "要不我先做？", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "做完给你看我的答案", 1));
-            data.add(new Message(getString(R.string.nickname2), R.drawable.contacts_2, "啊啊好的谢谢", 0));
-            data.add(new Message(getString(R.string.nickname2), R.drawable.contacts_2, "不好意思有个表hr让我尽快填完", 0));
-            data.add(new Message(getString(R.string.nickname2), R.drawable.contacts_2, "所以我现在在抓紧时间填", 0));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "ok", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "EAADD ABABC", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "除了最后一个不太确定", 1));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "其他应该没问题", 1));
-            data.add(new Message(getString(R.string.nickname2), R.drawable.contacts_2, "啊谢谢！", 0));
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "hhh好滴", 1));
-        }
         listView.setDivider(null);
         listView.setSelector(android.R.color.transparent);
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        messageAdapter = new MessageAdapter(data,context);
-        listView.setAdapter(messageAdapter);
+        data = new LinkedList<>();
+        TextView title_text = getActivity().findViewById(R.id.title_text);
+
+        if(chat_type == 0) {
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("talkToUserId", talkToId);
+
+            HttpRequest.sendOkHttpPostRequest("chat/get", new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    String resStr = response.body().string();
+                    Log.e("response", resStr);
+                    try {
+                        JSONObject jsonObject = new JSONObject(resStr);
+                        if (jsonObject.getBoolean("success")) {
+                            JSONArray messages = jsonObject.getJSONArray("messages");
+                            for (int j = 0; j < messages.length(); j++) {
+                                int k = 0;
+                                if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                    k = 0;
+                                } else {
+                                    k = 1;
+                                }
+                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
+                            }
+                            handler_chats.sendEmptyMessage(1);
+                        } else {
+                            Looper.prepare();
+                            Toast.makeText(getActivity().getApplicationContext(), "好友消息获取失败", Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                            handler_chats.sendEmptyMessage(1);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }
+            }, params);
+
+            handler_chats = new Handler() {
+                @SuppressLint("HandlerLeak")
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    messageAdapter = new MessageAdapter(data, context);
+                    listView.setAdapter(messageAdapter);
+                }
+            };
+        }
+
+        else if(chat_type == 1)
+        {
+            HashMap<String, String> params = new HashMap<>();
+
+            HttpRequest.sendOkHttpPostRequest("group/get", new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    String resStr = response.body().string();
+                    Log.e("response", resStr);
+                    try {
+                        JSONObject jsonObject = new JSONObject(resStr);
+                        if (jsonObject.getBoolean("success")) {
+                            JSONArray groups = jsonObject.getJSONArray("groups");
+                            int index=0;
+                            for(int i=0;i<groups.length();i++) {
+                                if(groups.getJSONObject(i).getString("id").equals(talkToId))
+                                {
+                                    index = i;
+                                }
+                            }
+                            try {
+                                SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                                String username = sp.getString("username", "");
+                                JSONArray groupMessages = groups.getJSONObject(index).getJSONArray("groupMessages");
+                                for(int j=0;j<groupMessages.length();j++)
+                                {
+                                    int k = 0;
+                                    if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
+                                        k = 1;
+                                    } else {
+                                        k = 0;
+                                    }
+                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k));
+                                }
+                            }
+                            catch (JSONException e)
+                            {
+
+                            }
+                            handler_group_chats.sendEmptyMessage(1);
+                        } else {
+                            Looper.prepare();
+                            Toast.makeText(getActivity().getApplicationContext(), "群聊消息获取失败", Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                            handler_group_chats.sendEmptyMessage(1);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                }
+            }, params);
+
+            handler_group_chats = new Handler() {
+                @SuppressLint("HandlerLeak")
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    messageAdapter = new MessageAdapter(data, context);
+                    listView.setAdapter(messageAdapter);
+                }
+            };
+        }
+
+
         EditText edit_text = getActivity().findViewById(R.id.editTextTextPersonName);
         edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -308,7 +574,22 @@ public class MessagesFragment extends Fragment {
                         imm.hideSoftInputFromWindow(
                                 v.getApplicationWindowToken(), 0);
                     }
-                    data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, v.getText().toString(), 1));
+                    mainActivity = (MainActivity ) getActivity();
+                    if(chat_type == 0) {
+                        JSONObject ws_msg_send = new JSONObject();
+                        try {
+                            ws_msg_send.put("bizType", "SEND_TEXT");
+                            ws_msg_send.put("content", v.getText().toString());
+                            ws_msg_send.put("targetUserId", talkToId);
+                            ws_msg_send.put("messageType", "TEXT");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                        String username = sp.getString("username", "");
+                        mainActivity.sendMsg(ws_msg_send.toString());
+                        data.add(new MessageA(username, R.drawable.contacts_6, v.getText().toString(), 1));
+                    }
                     messageAdapter.notifyDataSetChanged();
                     edit_text.setText("");
                     return true;
@@ -361,7 +642,7 @@ public class MessagesFragment extends Fragment {
             public void onClick(View v) {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
-                groupInfoFragment.saveMessageInfo(title_text.getText().toString());
+                groupInfoFragment.saveMessageInfo(talkToId);
                 transaction.replace(R.id.flFragment, groupInfoFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
@@ -386,6 +667,54 @@ public class MessagesFragment extends Fragment {
         startActivityForResult(intent, 222);
     }
 
+    private void getPicture(){
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 111);
+    }
+
+    private void uploadFile(String path) throws IOException {
+        HttpRequest.sendOkHttpUploadFile("file/upload", new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        filename = jsonObject.getString("fileName");
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), "图片"+"上传成功", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"图片错误", Toast.LENGTH_SHORT).show();
+                    }
+//                    handler_images.sendEmptyMessage(1);
+                    Looper.loop();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+            }
+        }, path);
+//        handler_images = new Handler(){
+//            @SuppressLint("HandlerLeak")
+//            public void handleMessage(Message msg){
+//                super.handleMessage(msg);
+//
+//            }
+//        };
+    }
+
     public void recordAudio() {
         if(mMediaRecorderUtils.isRecording() == false) {
             mMediaRecorderUtils.start();
@@ -395,7 +724,7 @@ public class MessagesFragment extends Fragment {
             mMediaRecorderUtils.stop();
             String audio_path = mMediaRecorderUtils.getPath();
             Log.d("path", audio_path);
-            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, 7, audio_path));
+            data.add(new MessageA(getString(R.string.nickname6), R.drawable.contacts_6, 7, audio_path));
             messageAdapter.notifyDataSetChanged();
         }
     }
@@ -413,6 +742,24 @@ public class MessagesFragment extends Fragment {
         mMediaRecorderUtils.onDestroy();
     }
 
+    private File uri2File(Uri uri) {
+        String img_path;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor actualimagecursor = getActivity().managedQuery(uri, proj, null,
+                null, null);
+        if (actualimagecursor == null) {
+            img_path = uri.getPath();
+        } else {
+            int actual_image_column_index = actualimagecursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            actualimagecursor.moveToFirst();
+            img_path = actualimagecursor
+                    .getString(actual_image_column_index);
+        }
+        File file = new File(img_path);
+        return file;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data_intent) {
@@ -427,8 +774,81 @@ public class MessagesFragment extends Fragment {
                     Uri imageUri = data_intent.getData();
                     Log.d("TAG", imageUri.toString());
 //                    iv_image.setImageURI(imageUri);
-                    data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, 3, imageUri));
-                    messageAdapter.notifyDataSetChanged();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getActivity().getContentResolver().query(imageUri,filePathColumn, null, null, null);
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    filepath = cursor.getString(columnIndex);
+                    cursor.close();
+//                    uploadFile(filepath);
+                    HashMap<String, String> params = new HashMap<>();
+                    params.put("talkToUserId", talkToId);
+                    params.put("messageType", "PHOTO");
+                    params.put("file", filepath);
+                    HttpRequest.sendOkHttpPostRequest("chat/file", new Callback() {
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                            Looper.prepare();
+                            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                            String resStr = response.body().string();
+                            Log.e("response", resStr);
+                            try {
+                                JSONObject jsonObject = new JSONObject(resStr);
+                                if (jsonObject.getBoolean("success")) {
+                                    JSONArray messages = jsonObject.getJSONArray("messages");
+                                    for (int j = 0; j < messages.length(); j++) {
+                                        int k = 0;
+                                        if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                            k = 0;
+                                        } else {
+                                            k = 1;
+                                        }
+                                        data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
+                                    }
+                                    handler_images.sendEmptyMessage(1);
+                                } else {
+                                    Looper.prepare();
+                                    Toast.makeText(getActivity().getApplicationContext(), "好友消息发送失败", Toast.LENGTH_SHORT).show();
+                                    Looper.loop();
+                                    handler_images.sendEmptyMessage(1);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Looper.prepare();
+                                Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                                Looper.loop();
+                            }
+                        }
+                    }, params);
+
+                    handler_chats = new Handler() {
+                        @SuppressLint("HandlerLeak")
+                        public void handleMessage(Message msg) {
+                            super.handleMessage(msg);
+                            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                            String username = sp.getString("username", "");
+                            data.add(new MessageA(username, R.drawable.contacts_6, 3, imageUri));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    };
+//                    JSONObject ws_msg_send = new JSONObject();
+//                    try {
+//                        ws_msg_send.put("bizType", "SEND_FILE");
+//                        ws_msg_send.put("file", file);
+//                        ws_msg_send.put("targetUserId", talkToId);
+//                        ws_msg_send.put("messageType", "PHOTO");
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+//                    String username = sp.getString("username", "");
+//                    mainActivity.sendMsg(ws_msg_send.toString());
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -447,7 +867,7 @@ public class MessagesFragment extends Fragment {
                     cursor.moveToFirst();
                     String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
                     Log.d("MainActivity", "filePath: " + filePath);
-                    data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, 5, filePath));
+                    data.add(new MessageA(getString(R.string.nickname6), R.drawable.contacts_6, 5, filePath));
                     messageAdapter.notifyDataSetChanged();
 //                    Log.d("TAG",uri.toString());
 //                    ContentResolver cr = getActivity().getContentResolver();

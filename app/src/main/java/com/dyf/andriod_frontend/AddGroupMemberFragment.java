@@ -176,11 +176,11 @@ public class AddGroupMemberFragment extends Fragment {
         // data.add(new Chat(getString(R.string.nickname2), R.drawable.avatar2, getString(R.string.sentence2), "2021/01/01"));
         // TODO
         data = new LinkedList<>();
-        data.add(new Contact(getString(R.string.nickname1), R.drawable.contacts_1));
-        data.add(new Contact(getString(R.string.nickname2), R.drawable.contacts_2));
-        data.add(new Contact(getString(R.string.nickname3), R.drawable.contacts_3));
-        data.add(new Contact(getString(R.string.nickname4), R.drawable.contacts_4));
-        data.add(new Contact(getString(R.string.nickname5), R.drawable.contacts_5));
+        data.add(new Contact(getString(R.string.nickname1), R.drawable.contacts_1, null));
+        data.add(new Contact(getString(R.string.nickname2), R.drawable.contacts_2, null));
+        data.add(new Contact(getString(R.string.nickname3), R.drawable.contacts_3, null));
+        data.add(new Contact(getString(R.string.nickname4), R.drawable.contacts_4, null));
+        data.add(new Contact(getString(R.string.nickname5), R.drawable.contacts_5, null));
         adapter = new CreateGroupContactsAdapter(context, data);
         listView.setAdapter(adapter);
 //        listView.setSelection(listView.getBottom());

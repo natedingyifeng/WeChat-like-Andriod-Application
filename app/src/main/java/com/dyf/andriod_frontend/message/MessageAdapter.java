@@ -14,7 +14,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.dyf.andriod_frontend.R;
 //import com.mcoy_jiang.videomanager.ui.McoyVideoView;
@@ -26,11 +25,11 @@ import cn.jzvd.JzvdStd;
 
 public class MessageAdapter extends BaseAdapter {
 
-    private LinkedList<Message> data;
+    private LinkedList<MessageA> data;
     private Context context;
     private MediaPlayer mp = new MediaPlayer();
 
-    public MessageAdapter(LinkedList<Message> data, Context context) {
+    public MessageAdapter(LinkedList<MessageA> data, Context context) {
         this.data = data;
         this.context = context;
     }
@@ -53,65 +52,91 @@ public class MessageAdapter extends BaseAdapter {
     @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Message message = data.get(position);
-        if(message.getComponentType() == 0) {
+        MessageA messageA = data.get(position);
+        if(messageA.getComponentType() == 0) {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_item_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             TextView content = (TextView) convertView.findViewById(R.id.message_content);
-            content.setText(message.getContent());
+            content.setText(messageA.getContent());
             return convertView;
         }
-        else if(message.getComponentType() == 1)
+        else if(messageA.getComponentType() == 1)
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_item_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             TextView content = (TextView) convertView.findViewById(R.id.message_content);
-            content.setText(message.getContent());
+            content.setText(messageA.getContent());
             return convertView;
         }
-        else if(message.getComponentType() == 2)
+        else if(messageA.getComponentType() == 2)
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_image_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
-            content.setImageURI(message.getContentImage());
+            content.setImageURI(messageA.getContentImage());
             return convertView;
         }
-        else if(message.getComponentType() == 3)
+        else if(messageA.getComponentType() == 3)
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_image_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
-            content.setImageURI(message.getContentImage());
+            content.setImageURI(messageA.getContentImage());
             return convertView;
         }
-        else if(message.getComponentType() == 5)
+        else if(messageA.getComponentType() == 5)
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_video_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
-            videoView.setUp(message.getVideoPath(), "Local Video");
+            videoView.setUp(messageA.getVideoPath(), "Local Video");
 //            McoyVideoView videoView = (McoyVideoView) convertView.findViewById(R.id.videoView);
 //            videoView.setVideoUrl(getRealFilePath(context, message.getContentImage()));
             return convertView;
         }
-        else if(message.getComponentType() == 7)
+        else if(messageA.getComponentType() == 6)
         {
-            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_right, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(message.getAvatarIcon());
+            icon.setImageResource(messageA.getAvatarIcon());
             Button voice = (Button) convertView.findViewById(R.id.voice_content);
             voice.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
                     if(mp.isPlaying() == false){
                         try {
-                            mp.setDataSource(message.getVideoPath());
+                            mp.setDataSource(messageA.getVideoPath());
+                            mp.prepare();
+                            mp.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        mp.stop();
+                        mp.reset();
+                    }
+                }
+            });
+            return convertView;
+        }
+        else if(messageA.getComponentType() == 7)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_right, parent, false);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
+            icon.setImageResource(messageA.getAvatarIcon());
+            Button voice = (Button) convertView.findViewById(R.id.voice_content);
+            voice.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    if(mp.isPlaying() == false){
+                        try {
+                            mp.setDataSource(messageA.getVideoPath());
                             mp.prepare();
                             mp.start();
                         } catch (IOException e) {
