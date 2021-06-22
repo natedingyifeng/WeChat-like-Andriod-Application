@@ -1,16 +1,23 @@
 package com.dyf.andriod_frontend;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaRecorder;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -25,19 +32,39 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.model.LatLng;
 import com.dyf.andriod_frontend.message.Message;
 import com.dyf.andriod_frontend.message.MessageAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+//import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,12 +85,24 @@ public class MessagesFragment extends Fragment {
     private String tv_VideoDuration;
     private String tv_VideoSize;
     private String tv_VideoTitle;
+    private int chat_type;
+    private MediaRecorderUtils mMediaRecorderUtils;
+    public LocationClient mLocationClient;
+    private TextView positionText;
+    private MapView mapView;
+    private BaiduMap baiduMap;
+    private boolean isFirstLocate = true;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
 
     public MessagesFragment() {
         // Required empty public constructor
+//        chat_type = type;
+    }
+
+    public void setChatType(int type) {
+        this.chat_type = type;
     }
 
     /**
@@ -78,12 +117,136 @@ public class MessagesFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * 权限申请
+     */
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String[] permissions = new String[]{Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), permissions, 200);
+                    return;
+                }
+            }
+        }
+    }
+
+    public class MyLocationListener extends BDAbstractLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            StringBuilder currentPosition = new StringBuilder();
+            currentPosition.append("纬度：").append(location.getLatitude()).append("\n");
+            currentPosition.append("经线：").append(location.getLongitude()).append("\n");
+            currentPosition.append("国家：").append(location.getCountry()).append("\n");
+            currentPosition.append("省：").append(location.getProvince()).append("\n");
+            currentPosition.append("市：").append(location.getCity()).append("\n");
+            currentPosition.append("区：").append(location.getDistrict()).append("\n");
+            currentPosition.append("街道：").append(location.getStreet()).append("\n");
+            currentPosition.append("定位方式：");
+            if (location.getLocType() == BDLocation.TypeGpsLocation) {
+                currentPosition.append("GPS");
+            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
+                currentPosition.append("网络");
+            }
+            positionText.setText(currentPosition);
+            Log.d("GPS", String.valueOf(currentPosition));
+            if (location.getLocType() == BDLocation.TypeGpsLocation
+                    || location.getLocType() == BDLocation.TypeNetWorkLocation) {
+                navigateTo(location);
+            }
+        }
+
+    }
+
+    private void navigateTo(BDLocation location) {
+        if (isFirstLocate) {
+            Toast.makeText(getActivity(), "nav to " + location.getAddrStr(), Toast.LENGTH_SHORT).show();
+            LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+            baiduMap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.zoomTo(16f);
+            baiduMap.animateMapStatus(update);
+            isFirstLocate = false;
+        }
+        MyLocationData.Builder locationBuilder = new MyLocationData.
+                Builder();
+        locationBuilder.latitude(location.getLatitude());
+        locationBuilder.longitude(location.getLongitude());
+        MyLocationData locationData = locationBuilder.build();
+        baiduMap.setMyLocationData(locationData);
+    }
+
+    private void requestLocation() {
+        initLocation();
+        mLocationClient.start();
+    }
+
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setScanSpan(5000);
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
+    }
+
+//    @SuppressLint("CheckResult")
+//    private void checkVersion() {
+//        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+//            RxPermissions rxPermissions = new RxPermissions(getActivity());
+//            rxPermissions.request(Manifest.permission.ACCESS_COARSE_LOCATION,
+//                    Manifest.permission.ACCESS_FINE_LOCATION,
+//                    Manifest.permission.READ_PHONE_STATE,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    .subscribe(granted -> {
+//                        if (granted) {//申请成功
+//                            //发起连续定位请求
+//                            initLocation();// 定位初始化
+//                        } else {//申请失败
+//                            Toast.makeText(getActivity(),"权限未开启",Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//        }else {
+//            initLocation();// 定位初始化
+//        }
+//    }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 //        bottomNavigationView = (MainActivity) getActivity().getMenu();
 //        bottomNavigationView.animate().translationY(bottomNavigationView.getHeight());
 //        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        mLocationClient = new LocationClient(getActivity().getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLocationListener());
+        SDKInitializer.initialize(getActivity().getApplicationContext());
+//        baiduMap = mapView.getMap();
+//        baiduMap.setMyLocationEnabled(true);
+//        checkVersion();
+        List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (!permissionList.isEmpty()) {
+            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
+        }
+        mMediaRecorderUtils = new MediaRecorderUtils.Builder(getActivity())
+                .setAudioSource(MediaRecorder.AudioSource.MIC)//麦克
+                .setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB)//AMR
+                .setOutputFormat(MediaRecorder.OutputFormat.AMR_WB)//AMR
+                .setDecibelSpace(500)//获取分贝的间隔
+                .build();
+        mMediaRecorderUtils.setMaximum(60);
         listView = getView().findViewById(R.id.message_listview);
         Context context = getActivity();
         Button title_back = getActivity().findViewById(R.id.title_back);
@@ -109,7 +272,7 @@ public class MessagesFragment extends Fragment {
             data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "好难呀", 1));
             data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "就是把他的数据重新处理一遍吗", 1));
             data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, "但论文怎么会写数据处理的过程", 1));
-            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "老师大致给了一个pipeline", 0));
+            data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "老师大致给了一个pipeline哈哈哈哈哈哈哈哈哈", 0));
             data.add(new Message(getString(R.string.nickname1), R.drawable.contacts_1, "但是还是很恶心", 0));
         }
         else if(title_text.getText().toString().equals(getString(R.string.nickname2))) {
@@ -167,6 +330,43 @@ public class MessagesFragment extends Fragment {
                 pickVideoFromAlbum();
             }
         });
+        Button voice_icon = getActivity().findViewById(R.id.voice_icon);
+        voice_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recordAudio();
+            }
+        });
+        Button location_icon = getActivity().findViewById(R.id.location_icon);
+        location_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getLocationInfo();
+            }
+        });
+        Button titleBack = (Button) getActivity().findViewById(R.id.title_back);
+        Button titleBack_2 = (Button) getActivity().findViewById(R.id.title_back2);
+        titleBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                ChatsFragment chatsFragment = new ChatsFragment();
+                transaction.replace(R.id.flFragment, chatsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+        titleBack_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
+                groupInfoFragment.saveMessageInfo(title_text.getText().toString());
+                transaction.replace(R.id.flFragment, groupInfoFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
 //        listView.setSelection(listView.getBottom());
     }
 
@@ -178,12 +378,42 @@ public class MessagesFragment extends Fragment {
     }
 
     public void pickVideoFromAlbum() {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_PICK);
-        intent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+//        Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_PICK);
+//        intent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+//        startActivityForResult(intent, 222);
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 222);
     }
 
+    public void recordAudio() {
+        if(mMediaRecorderUtils.isRecording() == false) {
+            mMediaRecorderUtils.start();
+        }
+        else
+        {
+            mMediaRecorderUtils.stop();
+            String audio_path = mMediaRecorderUtils.getPath();
+            Log.d("path", audio_path);
+            data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, 7, audio_path));
+            messageAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void getLocationInfo() {
+        requestLocation();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mLocationClient.stop();
+        mapView.onDestroy();
+        baiduMap.setMyLocationEnabled(false);
+        mMediaRecorderUtils.onDestroy();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data_intent) {
         super.onActivityResult(requestCode, resultCode, data_intent);
@@ -210,7 +440,14 @@ public class MessagesFragment extends Fragment {
                 }
                 try {
                     Uri uri = data_intent.getData();
-                    data.add(new Message(getString(R.string.nickname12), R.drawable.avatar12, 5, uri));
+                    Log.d("MainActivity", "URL: " + uri);
+                    ContentResolver cr = getActivity().getContentResolver();
+                    Cursor cursor = cr.query(uri, null, null, null, null);
+                    Log.d("MainActivity", "URL: " + uri);
+                    cursor.moveToFirst();
+                    String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
+                    Log.d("MainActivity", "filePath: " + filePath);
+                    data.add(new Message(getString(R.string.nickname6), R.drawable.contacts_6, 5, filePath));
                     messageAdapter.notifyDataSetChanged();
 //                    Log.d("TAG",uri.toString());
 //                    ContentResolver cr = getActivity().getContentResolver();

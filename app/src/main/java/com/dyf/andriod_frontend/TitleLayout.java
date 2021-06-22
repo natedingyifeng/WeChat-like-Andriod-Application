@@ -1,6 +1,7 @@
 package com.dyf.andriod_frontend;
 
 import android.app.Activity;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -16,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
 
 import com.dyf.andriod_frontend.chat.Chat;
@@ -29,35 +29,14 @@ import java.util.ArrayList;
 import butterknife.BindView;
 
 public class TitleLayout extends LinearLayout {
+    private int chat_type;
+    public void setChat_type(int type) {
+        this.chat_type = type;
+    }
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
     public TitleLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.title_bar, this);
-        Button titleBack = (Button) findViewById(R.id.title_back);
-        titleBack.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Activity activity = ((Activity) getContext());
-                if (activity.getFragmentManager().getBackStackEntryCount() > 0 ){
-                    activity.getFragmentManager().popBackStack();
-                } else {
-                    activity.onBackPressed();
-                }
-                TextView title = activity.findViewById(R.id.title_text);
-                if(title.getText().toString().equals(context.getString(R.string.nickname1)) || title.getText().toString().equals(context.getString(R.string.nickname2))  || title.getText().toString().equals(context.getString(R.string.nickname3))  || title.getText().toString().equals(context.getString(R.string.nickname4))  || title.getText().toString().equals(context.getString(R.string.nickname5)))
-                {
-                    title.setText("聊天");
-                }
-                titleBack.setVisibility(GONE);
-                Button title_back_2 = activity.findViewById(R.id.title_back2);
-                title_back_2.setVisibility(GONE);
-                bottomNavigationView = activity.findViewById(R.id.bottomNavigationView);
-                bottomNavigationView.setVisibility(View.VISIBLE);
-//                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) title.getLayoutParams();
-//                lp.setMargins(0,0,0, 0);
-//                title.setLayoutParams(lp);
-            }
-        });
     }
 }

@@ -1,8 +1,11 @@
 package com.dyf.andriod_frontend.contact;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,46 +16,39 @@ import com.dyf.andriod_frontend.R;
 
 import java.util.LinkedList;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
+public class ContactAdapter extends BaseAdapter {
     private LinkedList<Contact> data;
+    private Context context;
 
-    // 完成类ContactViewHolder
-    // 使用itemView.findViewById()方法来寻找对应的控件
-    // TODO
-    public static class ContactViewHolder extends RecyclerView.ViewHolder {
-        protected TextView nickname;
-        protected ImageView avatarIcon;
-        public ContactViewHolder(@NonNull View itemView) {
-            super(itemView);
-            nickname = (TextView) itemView.findViewById(R.id.contact_nickname_text);
-            avatarIcon = (ImageView) itemView.findViewById(R.id.contact_avatar_icon);
-        }
-
-    }
-
-    public ContactAdapter(LinkedList<Contact> data) {
+    public ContactAdapter(LinkedList<Contact> data, Context context) {
         this.data = data;
-    }
-
-    @NonNull
-    @Override
-    public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // TODO
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycle_contact, parent, false);
-        return new ContactViewHolder(itemView);
+        this.context = context;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        // TODO
-        Contact contact = data.get(position);
-        holder.nickname.setText(contact.getNickname());
-        holder.avatarIcon.setImageResource(contact.getAvatarIcon());
-    }
-
-    @Override
-    public int getItemCount() {
-        // TODO
+    public int getCount() {
         return data.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return data.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @SuppressLint("ViewHolder")
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        convertView = LayoutInflater.from(context).inflate(R.layout.item_recycle_contact, parent, false);
+        Contact contact = data.get(position);
+        TextView nickname = (TextView) convertView.findViewById(R.id.contact_nickname_text);
+        nickname.setText(contact.getNickname());
+        ImageView avatarIcon = (ImageView) convertView.findViewById(R.id.contact_avatar_icon);
+        avatarIcon.setImageResource(contact.getAvatarIcon());
+        return convertView;
     }
 }

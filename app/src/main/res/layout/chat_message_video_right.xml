@@ -22,7 +22,7 @@
 <!--        android:gravity="right"-->
 <!--        android:paddingRight="15dp" />-->
 
-    <fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard
+    <cn.jzvd.JzvdStd
         android:id="@+id/player_list_video"
         android:layout_width="match_parent"
         android:layout_height="220dp"
@@ -30,10 +30,12 @@
 
     <ImageView
         android:id="@+id/message_avatar_icon"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
         android:contentDescription="@string/app_name"
+        android:padding="5dp"
         android:src="@drawable/avatar1" />
+
 
 
 </LinearLayout>
