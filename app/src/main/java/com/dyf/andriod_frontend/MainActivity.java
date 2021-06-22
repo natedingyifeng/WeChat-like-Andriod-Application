@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.ListFragment;
 import androidx.fragment.app.Fragment;
 
-import com.dyf.andriod_frontend.utils.HttpRequest;
+import com.dyf.andriod_frontend.Setting.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.Manifest;
@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.net.http.HttpResponseCache;
@@ -27,7 +26,6 @@ import butterknife.ButterKnife;
 
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
@@ -36,18 +34,9 @@ import android.widget.Toast;
 import com.dyf.andriod_frontend.moments.MomentsFragment;
 
 import org.java_websocket.client.WebSocketClient;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -189,8 +178,6 @@ public class MainActivity extends AppCompatActivity  {
 //
 //        // 初始化websocket
 //        WebSocketService.initSocket();
-
-//        myWebSClientService.connect();
 
         Log.d("position", "String.valueOf(position)");
 

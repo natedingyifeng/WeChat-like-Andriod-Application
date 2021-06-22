@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsFragment">
+    tools:context=".Setting.SettingsFragment">
 
     <ImageView
         android:id="@+id/settings_bg_image_view"
@@ -115,7 +115,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/modify_info"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="80dp"/>
+
+        <Button
+            android:id="@+id/settings_password_modify_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="修改密码"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
 
 </FrameLayout>

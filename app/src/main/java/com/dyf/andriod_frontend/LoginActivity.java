@@ -114,12 +114,73 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("username", username);
                         editor.putString("password", password);
-                        editor.commit();
+                        editor.apply();
+
+                        getSelfInfo();
+                        
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
+                        Looper.prepare();
+                        Toast.makeText(getApplicationContext(),"登陆成功", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),R.string.username_or_password_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        }, params);
+    }
+
+    private void getSelfInfo(){
+        SharedPreferences sp = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        if(username == ""){
+            Looper.prepare();
+            Toast.makeText(getApplicationContext(),"用户信息获取失败", Toast.LENGTH_SHORT).show();
+            Looper.loop();
+            return;
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("keyword", username);
+
+        HttpRequest.sendOkHttpPostRequest("user/search", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        // 获取用户数据
+                        JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
+                        // 将用户数据存入本地
+                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("avatarUrl", user.getString("avatarUrl"));
+                        editor.putString("nickname", user.getString("nickname"));
+                        editor.putString("id", user.getString("id"));
+                        editor.apply();
+                        Looper.prepare();
+                        Toast.makeText(getApplicationContext(),"用户信息获取成功", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getApplicationContext(),"用户信息获取失败", Toast.LENGTH_SHORT).show();
                         Looper.loop();
                     }
                 } catch (JSONException e) {

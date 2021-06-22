@@ -1,4 +1,4 @@
-package com.dyf.andriod_frontend;
+package com.dyf.andriod_frontend.Setting;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,8 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-
-import org.w3c.dom.Text;
+import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +28,9 @@ import org.w3c.dom.Text;
 public class SettingsFragment extends Fragment {
     private String username;
     private String nickname;
+    private String avatarUrl;
+    private String slogan;
+    private String phoneNumber;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -52,21 +55,35 @@ public class SettingsFragment extends Fragment {
         TextView sloganView = view.findViewById(R.id.settings_slogan_text_view);
         TextView phoneNumberView = view.findViewById(R.id.settings_phone_number_text_view);
 
-        Glide.with(this).load(getString(R.string.test_user_avatar_url)).into(avatarView);
+
         SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-        username = sp.getString("username", "yihao_xu");
-        nickname = sp.getString("nickname", "九月的南瓜");
+
+        username = sp.getString("username", "获取失败");
+        nickname = sp.getString("nickname", "获取失败");
+        avatarUrl = HttpRequest.media_url+ sp.getString("avatarUrl", "R.string.test_user_avatar_url");
+        slogan = sp.getString("slogan", "这个人很懒，什么都没有留下。");
+        phoneNumber = sp.getString("phoneNumber", "");
+
         nicknameView.setText(nickname);
         usernameView.setText(username);
-
-        phoneNumberView.setText(sp.getString("phoneNumber", "15808901623"));
-        sloganView.setText(sp.getString("slogan", "为祖国健康工作五十年！"));
+        Glide.with(this).load(avatarUrl).into(avatarView);
+        phoneNumberView.setText(phoneNumber);
+        sloganView.setText(slogan);
 
         Button image_icon = getActivity().findViewById(R.id.settings_modify_btn);
         image_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SettingsModifyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button passwordBtn = getActivity().findViewById(R.id.settings_password_modify_btn);
+        passwordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SettingsPasswordModifyActivity.class);
                 startActivity(intent);
             }
         });
