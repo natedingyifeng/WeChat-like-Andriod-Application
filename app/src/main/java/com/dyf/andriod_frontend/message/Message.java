@@ -9,14 +9,14 @@ public class Message {
     private final int avatarIcon; // 头像
     private final int componentType;
     private final Uri content_image;
-    private final Uri content_video;
+    private final String video_path;
 
     public Message(String nickname, int avatarIcon, String content, int componentType) {
         this.avatarIcon = avatarIcon;
         this.content = content;
         this.componentType = componentType;
         this.content_image = null;
-        this.content_video = null;
+        this.video_path = null;
     }
 
     public Message(String nickname, int avatarIcon, int componentType, Uri content_image) {
@@ -24,7 +24,15 @@ public class Message {
         this.content = "";
         this.componentType = componentType;
         this.content_image = content_image;
-        this.content_video = null;
+        this.video_path = null;
+    }
+
+    public Message(String nickname, int avatarIcon, int componentType, String path) {
+        this.avatarIcon = avatarIcon;
+        this.content = "";
+        this.componentType = componentType;
+        this.content_image = null;
+        this.video_path = path;
     }
 
     public int getAvatarIcon() {
@@ -38,4 +46,6 @@ public class Message {
     public int getComponentType() { return componentType; }
 
     public Uri getContentImage() { return content_image; }
+
+    public String getVideoPath() { return video_path; }
 }

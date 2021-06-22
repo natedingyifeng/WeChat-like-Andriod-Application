@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="55dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="93dp"
+        android:background="#F4F2F2"
         android:stackFromBottom="true"
         android:transcriptMode="alwaysScroll" />
 
@@ -50,24 +51,24 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginLeft="35dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginRight="35dp"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/phone" />
+                android:background="@drawable/record" />
 
             <Button
                 android:id="@+id/image_icon"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginLeft="35dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginRight="35dp"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/image" />
@@ -76,11 +77,11 @@
                 android:id="@+id/video_icon"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginLeft="35dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginRight="35dp"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/vedio" />
@@ -89,40 +90,15 @@
                 android:id="@+id/location_icon"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginLeft="35dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginRight="35dp"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/location" />
 
-            <Button
-                android:id="@+id/emoji_icon"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/emoji" />
-
-            <Button
-                android:id="@+id/more_icon"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/add" />
         </LinearLayout>
 
     </LinearLayout>

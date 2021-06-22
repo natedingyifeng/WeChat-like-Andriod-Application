@@ -4,24 +4,31 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.dyf.andriod_frontend.R;
 //import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 
+import java.io.IOException;
 import java.util.LinkedList;
+
+import cn.jzvd.JzvdStd;
 
 public class MessageAdapter extends BaseAdapter {
 
     private LinkedList<Message> data;
     private Context context;
+    private MediaPlayer mp = new MediaPlayer();
 
     public MessageAdapter(LinkedList<Message> data, Context context) {
         this.data = data;
@@ -87,8 +94,36 @@ public class MessageAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_video_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             icon.setImageResource(message.getAvatarIcon());
+            JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
+            videoView.setUp(message.getVideoPath(), "Local Video");
 //            McoyVideoView videoView = (McoyVideoView) convertView.findViewById(R.id.videoView);
 //            videoView.setVideoUrl(getRealFilePath(context, message.getContentImage()));
+            return convertView;
+        }
+        else if(message.getComponentType() == 7)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_right, parent, false);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
+            icon.setImageResource(message.getAvatarIcon());
+            Button voice = (Button) convertView.findViewById(R.id.voice_content);
+            voice.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    if(mp.isPlaying() == false){
+                        try {
+                            mp.setDataSource(message.getVideoPath());
+                            mp.prepare();
+                            mp.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        mp.stop();
+                        mp.reset();
+                    }
+                }
+            });
             return convertView;
         }
         else return null;

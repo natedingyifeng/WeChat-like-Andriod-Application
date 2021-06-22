@@ -35,8 +35,7 @@
         android:layout_height="30dp"
         android:layout_gravity="center"
         android:layout_margin="5dp"
-        android:background="#E4E4E4"
-        android:textSize="24dp"
-        app:backgroundTint="#E4E4E4" />
+        android:background="@drawable/more"
+        android:textSize="24dp" />
 
 </LinearLayout>
