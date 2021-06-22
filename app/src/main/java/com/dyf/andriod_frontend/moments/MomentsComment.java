@@ -22,7 +22,8 @@ public class MomentsComment {
 //        this.postId = jsonObject.getString("_id");
         this.content = jsonObject.getString("content");
         this.user = new User(jsonObject.getJSONObject("user"));
-        this.talkToUser = new User(jsonObject.getJSONObject("talkToUser"));
+        if (jsonObject.has("talkToUser"))
+            this.talkToUser = new User(jsonObject.getJSONObject("talkToUser"));
     }
 
     public String getPostId() {

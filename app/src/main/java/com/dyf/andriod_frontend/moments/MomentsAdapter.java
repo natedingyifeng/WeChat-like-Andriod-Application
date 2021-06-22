@@ -264,7 +264,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 HashMap<String, String> params = new HashMap<>();
                 params.put("content", inputServer.getText().toString());
                 params.put("postId", moments.get(position).getId());
-                params.put("talkToUserId", moments.get(position).getMomentsOwner().getId());
+//                params.put("talkToUserId", moments.get(position).getMomentsOwner().getId());
                 HttpRequest.sendOkHttpPostRequest("post/comment", new okhttp3.Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
