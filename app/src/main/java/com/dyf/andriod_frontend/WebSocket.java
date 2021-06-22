@@ -29,6 +29,7 @@ public class WebSocket {
                 @Override
                 public void onMessage(String message) {
                     Message msg = new Message();
+                    Log.e("send msg", message);
                     msg.what = 1;
                     msg.obj = message;
                     MainActivity.msgHandler.sendMessage(msg);

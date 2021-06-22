@@ -26,7 +26,7 @@ public class WebSocketService extends Service {
 
     private static int RE_TIME = 5;  // 发起重连的时间
 
-    public static WebSocketClient socketClient = null;
+    public static MyWebSocketClient socketClient = null;
 
     private static String SOCKET_URL = "ws://183.172.186.150:520/ws";
     private MyWebSocketClientBinder mBinder = new MyWebSocketClientBinder();
@@ -76,31 +76,32 @@ public class WebSocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("INIT", "INIT");
+        Log.d("INIT", "INIT1");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //初始化websocket
-        Log.d("INIT", "INIT");
+        Log.d("INIT", "INIT2");
         initSocket();
         mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE);//开启心跳检测
+        Log.d("INIT", "INIT3");
 
-        //设置service为前台服务，提高优先级
-        if (Build.VERSION.SDK_INT < 18) {
-            //Android4.3以下 ，隐藏Notification上的图标
-            startForeground(GRAY_SERVICE_ID, new Notification());
-        } else if(Build.VERSION.SDK_INT>18 && Build.VERSION.SDK_INT<25){
-            //Android4.3 - Android7.0，隐藏Notification上的图标
-            Intent innerIntent = new Intent(this, GrayInnerService.class);
-            startService(innerIntent);
-            startForeground(GRAY_SERVICE_ID, new Notification());
-        }else{
-            //Android7.0以上app启动后通知栏会出现一条"正在运行"的通知
-            startForeground(GRAY_SERVICE_ID, new Notification());
-        }
-
-        acquireWakeLock();
+//        //设置service为前台服务，提高优先级
+//        if (Build.VERSION.SDK_INT < 18) {
+//            //Android4.3以下 ，隐藏Notification上的图标
+//            startForeground(GRAY_SERVICE_ID, new Notification());
+//        } else if(Build.VERSION.SDK_INT>18 && Build.VERSION.SDK_INT<25){
+//            //Android4.3 - Android7.0，隐藏Notification上的图标
+//            Intent innerIntent = new Intent(this, GrayInnerService.class);
+//            startService(innerIntent);
+//            startForeground(GRAY_SERVICE_ID, new Notification());
+//        }else{
+//            //Android7.0以上app启动后通知栏会出现一条"正在运行"的通知
+//            startForeground(GRAY_SERVICE_ID, new Notification());
+//        }
+//
+//        acquireWakeLock();
         return START_STICKY;
     }
 
@@ -111,39 +112,42 @@ public class WebSocketService extends Service {
     }
 
 
-    public static void initSocket() {
-        try {
-            URI u = new URI(SOCKET_URL);
-            socketClient = new WebSocketClient(u) {
-                @Override
-                public void onOpen(ServerHandshake handshakedata) {
-                    Log.d("Socket", "成功连接！");
-                }
+    private void initSocket() {
+        URI u = URI.create(SOCKET_URL);
+        socketClient = new MyWebSocketClient(u) {
 
-                @Override
-                public void onMessage(String message) {
-                    Message msg = new Message();
-                    msg.what = 1;
-                    msg.obj = message;
-                    MainActivity.msgHandler.sendMessage(msg);
-                }
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {
+                Log.d("Socket", "成功连接！");
+            }
 
-                @Override
-                public void onClose(int code, String reason, boolean remote) {
-                    socketClient = null;
-                    if (code != 1000)   // 1000为正常关闭，不是意外关闭
-                        WebSocketService.reconnect();
-                }
+            @Override
+            public void onMessage(String message) {
+                Log.e("MyWebSocketService", "收到的消息：" + message);
+//                    Message msg = new Message();
+//                    msg.what = 1;
+//                    msg.obj = message;
+//                    MainActivity.msgHandler.sendMessage(msg);
+                Intent intent = new Intent();
+                intent.setAction("com.dyf.servicecallback.content");
+                intent.putExtra("message", message);
+                sendBroadcast(intent);
+            }
 
-                @Override
-                public void onError(Exception ex) {
-                    socketClient = null;
-                }
-            };
-            socketClient.connect();
-        } catch (Exception e) {
+            @Override
+            public void onClose(int code, String reason, boolean remote) {
+                socketClient = null;
+//                   if (code != 1000)   // 1000为正常关闭，不是意外关闭
+//                       WebSocketService.reconnect();
+            }
 
-        }
+            @Override
+            public void onError(Exception ex) {
+                socketClient = null;
+            }
+        };
+//            socketClient.connect();
+        connect();
     }
 
     private void connect() {
@@ -161,10 +165,10 @@ public class WebSocketService extends Service {
 
     }
 
-    public static boolean send(JSONObject msg) {
-        if (socketClient.isOpen()) {
-            Log.e("send msg", msg.toString());
-            socketClient.send(msg.toString());
+    public boolean send(String msg) {
+        if (socketClient != null) {
+            Log.e("send msg", msg);
+            socketClient.send(msg);
             return true;
         } else {
             return false;
@@ -203,7 +207,7 @@ public class WebSocketService extends Service {
         }
     };
 
-    public static void reconnect() {
+    private void reconnect() {
         new Thread(() -> {
             try {
                 while (socketClient == null || !socketClient.isOpen()) {

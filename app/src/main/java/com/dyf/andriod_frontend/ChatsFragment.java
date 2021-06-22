@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -35,6 +36,9 @@ import androidx.fragment.app.ListFragment;
 import com.dyf.andriod_frontend.chat.Chat;
 import com.dyf.andriod_frontend.chat.ChatAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -104,38 +108,19 @@ public class ChatsFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         // Notification
-        Intent intent = new Intent(getContext(), NotificationActivity.class);
-        PendingIntent pi = PendingIntent.getActivities(getContext(), 0, new Intent[]{intent}, 0);
-        NotificationManager manager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
-        // 兼容  API 26，Android 8.0
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            // 第三个参数表示通知的重要程度，默认则只在通知栏闪烁一下
-            NotificationChannel notificationChannel = new NotificationChannel("AppTestNotificationId", "AppTestNotificationName", NotificationManager.IMPORTANCE_HIGH);
-            notificationChannel.setShowBadge(true);
-            notificationChannel.enableVibration(true);
-            // 注册通道，注册后除非卸载再安装否则不改变
-            manager.createNotificationChannel(notificationChannel);
+        MainActivity mainActivity = (MainActivity ) getActivity();
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        Notification notification = new Notification.Builder(getContext())
-                .setContentTitle("This is content title")
-                .setContentText("This is content text")
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_play)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
-                .setContentIntent(pi)
-                .setAutoCancel(true) // 取消通知
-                .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
-                //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
-                .setVibrate(new long[]{0, 1000, 1000, 1000})
-                .setLights(Color.GREEN, 1000, 1000) // LED灯
-                .setChannelId("AppTestNotificationId")
-                //        .setLights(Color.GREEN, 1000, 1000)
-                .setDefaults(Notification.DEFAULT_ALL)
-                //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
-//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
-                .setPriority(Notification.PRIORITY_MAX)
-                .build();
-        manager.notify(1, notification);
+        mainActivity.sendMsg(ws_msg_login.toString());
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         MessagesFragment messagesFragment = new MessagesFragment();

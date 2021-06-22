@@ -61,6 +61,14 @@
         <activity android:name=".NotificationActivity"></activity>
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
         </service>
+        <service android:name=".WebSocketService"
+            android:enabled="true"
+            android:exported="false"/>
+        <service
+            android:name=".WebSocketService$GrayInnerService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":gray" />
     </application>
 
 </manifest>

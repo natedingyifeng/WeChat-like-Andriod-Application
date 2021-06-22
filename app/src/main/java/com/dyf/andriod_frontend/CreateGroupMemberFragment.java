@@ -176,6 +176,17 @@ public class CreateGroupMemberFragment extends Fragment {
         menuLinerLayout = (LinearLayout) getActivity().findViewById(R.id.linearLayoutMenu);
         Button title_back = getActivity().findViewById(R.id.title_back);
         title_back.setVisibility(View.VISIBLE);
+        title_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                title.setText("通讯录");
+                ContactsFragment contactsFragment = new ContactsFragment();
+                transaction.replace(R.id.flFragment, contactsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
         Button title_back_2 = getActivity().findViewById(R.id.title_back2);
         title_back_2.setVisibility(View.INVISIBLE);
         button = (Button) getActivity().findViewById(R.id.button_create_groupchat);
@@ -199,8 +210,9 @@ public class CreateGroupMemberFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                ChatsFragment chatsFragment = new ChatsFragment();
-                transaction.replace(R.id.flFragment, chatsFragment);
+                title.setText("通讯录");
+                ContactsFragment contactsFragment = new ContactsFragment();
+                transaction.replace(R.id.flFragment, contactsFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }

@@ -68,6 +68,14 @@ public class MomentsReleaseActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
+        Button titleBack = (Button) findViewById(R.id.title_back);
+        titleBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
 
         imageView[0]= findViewById(R.id.moments_release_imageView1);
         imageView[1]= findViewById(R.id.moments_release_imageView2);

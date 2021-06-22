@@ -30,6 +30,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dyf.andriod_frontend.moments.MomentsFragment;
@@ -56,10 +57,9 @@ public class MainActivity extends AppCompatActivity  {
     public static Handler msgHandler;
     private HttpResponseCache MultiDex;
 
-    private WebSocketClient client;
-    private WebSocketService.MyWebSocketClientBinder binder;
-    private WebSocketService myWebSClientService;
-    private ContactsMessageReceiver contactMessageReceiver;
+    public MyWebSocketClient client;
+    public WebSocketService.MyWebSocketClientBinder binder;
+    public WebSocketService myWebSClientService;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -76,6 +76,10 @@ public class MainActivity extends AppCompatActivity  {
         }
     };
 
+    public void sendMsg(String msg) {
+        myWebSClientService.send(msg);
+    }
+
     /**
      * 绑定服务
      */
@@ -89,20 +93,6 @@ public class MainActivity extends AppCompatActivity  {
     public void startMyWebSClientService() {
         Intent intent = new Intent(this, WebSocketService.class);
         startService(intent);
-    }
-
-    private class ContactsMessageReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message=intent.getStringExtra("message");
-        }
-    }
-
-    private void doRegisterReceiver() {
-        contactMessageReceiver = new ContactsMessageReceiver();
-        IntentFilter filter = new IntentFilter("com.xch.servicecallback.content");
-        registerReceiver(contactMessageReceiver, filter);
     }
 
     /**
@@ -147,7 +137,6 @@ public class MainActivity extends AppCompatActivity  {
 
         startMyWebSClientService();
         bindService();
-        doRegisterReceiver();
 
         // 修改下面的代码，添加向 settingsFragment的跳转逻辑
         // TODO
@@ -164,19 +153,25 @@ public class MainActivity extends AppCompatActivity  {
 
         bottomNavigationView.inflateMenu(R.menu.bottom_nav_menu);
 
+        TextView title = findViewById(R.id.title_text);
+
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
                     switch (item.getItemId()) {
                         case R.id.chats:
                             setCurrentListFragment(chatsFragment);
+                            title.setText(R.string.chats);
                             return true;
                         case R.id.contacts:
                             setCurrentFragment(contactsFragment);
+                            title.setText(R.string.contacts);
                             return true;
                         case R.id.moments:
                             setCurrentFragment(momentsFragment);
+                            title.setText(R.string.moments);
                             return true;
                         case R.id.settings:
                             setCurrentFragment(settingsFragment);
+                            title.setText(R.string.settings);
                             return true;
                     }
                     return false;
@@ -192,58 +187,10 @@ public class MainActivity extends AppCompatActivity  {
 //            }
 //        };
 //
-        // 初始化websocket
+//        // 初始化websocket
 //        WebSocketService.initSocket();
 
-        HashMap<String, String> params = new HashMap<>();
-        params.put("username", "yihao_xu");
-        params.put("password", "123456");
-
-        HttpRequest.sendOkHttpPostRequest("user/login", new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Looper.prepare();
-                Toast.makeText(getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
-                Looper.loop();
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String resStr = response.body().string();
-                Log.e("response", resStr);
-                try {
-                    JSONObject jsonObject = new JSONObject(resStr);
-                    if (jsonObject.getBoolean("success")){
-                        // 将用户数据存入本地
-                        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("username", "yihao_xu");
-                        editor.commit();
-                    }else{
-                        Looper.prepare();
-                        Toast.makeText(getApplicationContext(),R.string.username_or_password_error, Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Looper.prepare();
-                    Toast.makeText(getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
-                    Looper.loop();
-                }
-            }
-        }, params);
-
-//        // 消息处理
-//        msgHandler = new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                super.handleMessage(msg);
-//                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_LONG).show();
-//            }
-//        };
-
-        // 初始化websocket
-//        WebSocket.initSocket();
+//        myWebSClientService.connect();
 
         Log.d("position", "String.valueOf(position)");
 

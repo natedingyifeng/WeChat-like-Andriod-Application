@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="55dp"
+        android:background="#F4F2F2">
+
+        <EditText
+            android:id="@+id/add_friend_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="名称" />
+
+        <Button
+            android:id="@+id/button_addfriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginRight="60dp"
+            android:text="添加好友"
+            android:textColor="#E91E63"
+            app:backgroundTint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/my_account_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginRight="60dp"
+            android:gravity="center_horizontal"
+            android:text="我的用户名："
+            android:textColor="#000000"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+</RelativeLayout>
+
