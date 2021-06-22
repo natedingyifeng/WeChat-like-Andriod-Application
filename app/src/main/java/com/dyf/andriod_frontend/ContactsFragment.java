@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dyf.andriod_frontend.contact.Contact;
 import com.dyf.andriod_frontend.contact.ContactAdapter;
+import com.dyf.andriod_frontend.friendrequest.FriendRequestActivity;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -90,6 +91,16 @@ public class ContactsFragment extends ListFragment {
                 Log.d("sentuser", json_contact.getJSONObject(0).getJSONObject("sentUser").get("id").toString());
                 sendNotificationOfNewFriend(json_contact.getJSONObject(0).getJSONObject("sentUser").get("username").toString());
                 id = new String(json_contact.getJSONObject(0).getJSONObject("sentUser").get("id").toString());
+
+                SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                JSONArray jsonArray = new JSONArray(sp.getString("friendRequest", "[]"));
+                for(int i = 0; i < json_contact.length(); i++){
+                    jsonArray.put(json_contact.getJSONObject(i));
+                }
+                editor.putString("friendRequest", jsonArray.toString());
+                editor.apply();
+
             } catch (JSONException e) {
             }
         }
@@ -184,6 +195,7 @@ public class ContactsFragment extends ListFragment {
         contacts = new LinkedList<>();
         contacts.add(new Contact("添加朋友", R.drawable.add_friends, 1, null));
         contacts.add(new Contact("发起群聊", R.drawable.group_chat, 2, null));
+        contacts.add(new Contact("好友请求", R.drawable.new_friend, 3, null));
 
         HashMap<String, String> params = new HashMap<>();
         params.put("keyword", username);
@@ -281,6 +293,10 @@ public class ContactsFragment extends ListFragment {
             transaction.replace(R.id.flFragment, creategroupFragment);
             transaction.addToBackStack(null);
             transaction.commit();
+        }
+        else if(contacts.get(position).getType() == 3){
+            Intent intent = new Intent(getActivity(), FriendRequestActivity.class);
+            startActivity(intent);
         }
         Log.d("position", String.valueOf(position));
     }

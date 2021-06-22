@@ -31,7 +31,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Andriod_frontend">
-        <activity android:name=".moments.MomentsVideoReleaseActivity"></activity>
+        <activity android:name=".friendrequest.FriendRequestActivity"></activity>
+        <activity android:name=".moments.MomentsVideoReleaseActivity" />
         <activity android:name=".user.UserInfoActivity" />
         <activity android:name=".Setting.SettingsPasswordModifyActivity" />
 
