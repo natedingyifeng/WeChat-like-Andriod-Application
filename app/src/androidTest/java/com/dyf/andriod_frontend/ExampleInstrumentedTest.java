@@ -7,10 +7,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.dyf.andriod_frontend.utils.HttpRequest;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.OkHttp;
+import okhttp3.Response;
 
 import static org.junit.Assert.*;
 
@@ -33,7 +38,17 @@ public class ExampleInstrumentedTest {
      */
     @Test
     public void httpGetTest() throws IOException {
-        String getResp = HttpRequest.get("user/search?username=yihao_xu");
+        HttpRequest.sendOkHttpUploadFile("file/upload", new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.out.println("Failed!\n");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                System.out.println(response.toString());
+            }
+        }, "内部存储/Pictures/Telegram/IMG_20210620_115602_248.jpg");
     }
 
 }

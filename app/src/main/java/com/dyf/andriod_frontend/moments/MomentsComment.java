@@ -2,6 +2,9 @@ package com.dyf.andriod_frontend.moments;
 
 import com.dyf.andriod_frontend.user.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MomentsComment {
     private String postId;
     private String content;
@@ -13,6 +16,13 @@ public class MomentsComment {
         this.user = user;
         this.content = content;
         this.talkToUser = talkToUser;
+    }
+
+    public MomentsComment(JSONObject jsonObject) throws JSONException {
+//        this.postId = jsonObject.getString("_id");
+        this.content = jsonObject.getString("content");
+        this.user = new User(jsonObject.getJSONObject("user"));
+        this.talkToUser = new User(jsonObject.getJSONObject("talkToUser"));
     }
 
     public String getPostId() {

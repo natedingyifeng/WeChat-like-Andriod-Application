@@ -15,7 +15,7 @@ public class WebSocket {
 
     private static WebSocketClient socketClient = null;
 
-    private static String SOCKET_URL = "ws://183.172.184.164:520/ws";
+    private static String SOCKET_URL = "ws://183.172.186.150:520/ws";
 
     public static void initSocket() {
         try {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/picture_moment_release_btn"
+        android:title="发布图文动态"/>
+    <item android:id="@+id/video_moment_release_btn"
+        android:title="发布视频动态"/>
+</menu>

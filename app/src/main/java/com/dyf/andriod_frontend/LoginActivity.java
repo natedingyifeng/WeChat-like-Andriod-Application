@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+//import androidx.multidex.MultiDex;
 
 import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.utils.HttpRequest;
@@ -33,6 +34,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -51,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        MultiDex.install(this);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
         Button title_back = findViewById(R.id.title_back);

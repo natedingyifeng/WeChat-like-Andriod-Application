@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 
 import butterknife.BindView;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity  {
     public BottomNavigationView bottomNavigationView;
 
     public static Handler msgHandler;
+    private HttpResponseCache MultiDex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,19 +79,19 @@ public class MainActivity extends AppCompatActivity  {
                 }
         );
 
-//        // 消息处理
-//        msgHandler = new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                super.handleMessage(msg);
-//                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_LONG).show();
-//            }
-//        };
-//
-//        // 初始化websocket
+        // 消息处理
+        msgHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_LONG).show();
+            }
+        };
+
+        // 初始化websocket
 //        WebSocket.initSocket();
 
-//        Log.d("position", "String.valueOf(position)");
+        Log.d("position", "String.valueOf(position)");
 
 
     }

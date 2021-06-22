@@ -1,6 +1,7 @@
 package com.dyf.andriod_frontend.moments;
 
 import com.dyf.andriod_frontend.user.User;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,16 +38,34 @@ public class Moment {
     public Moment(JSONObject jsonObject) throws JSONException {
         // TODO 根据后端提供的http回复来构造Moment
         this.content = jsonObject.getString("content");
-        this.comments = null;
         this.createdAt = jsonObject.getString("createdAt");
         this.id = jsonObject.getString("id");
         this.lastModifiedAt = jsonObject.getString("lastModifiedAt");
         this.momentsOwner = new User(jsonObject.getJSONObject("postOwner"));
         this.postType = jsonObject.getString("postType");
+
+        this.comments = new LinkedList<>();
+        if(jsonObject.has("comments")) {
+            JSONArray commentsArray = jsonObject.getJSONArray("comments");
+            for(int i = 0; i < commentsArray.length(); i++){
+                comments.add(new MomentsComment(commentsArray.getJSONObject(i)));
+            }
+        }
+
+        this.imagesUrl = new ArrayList<String>();
+        if(jsonObject.has("filePaths")) {
+            JSONArray imagesArray = jsonObject.getJSONArray("filePaths");
+            for (int i = 0; i < imagesArray.length(); i++) {
+                imagesUrl.add(HttpRequest.media_url + imagesArray.getString(i));
+            }
+        }
+
         this.likedUsers = new ArrayList<User>();
-        JSONArray jsonArray = jsonObject.getJSONArray("likedUsers");
-        for(int i = 0; i < jsonArray.length(); i++){
-            likedUsers.add(new User(jsonArray.getJSONObject(i)));
+        if(jsonObject.has("likedUsers")) {
+            JSONArray likedUsersArray = jsonObject.getJSONArray("likedUsers");
+            for (int i = 0; i < likedUsersArray.length(); i++) {
+                likedUsers.add(new User(likedUsersArray.getJSONObject(i)));
+            }
         }
     }
 
