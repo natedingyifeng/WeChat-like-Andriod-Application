@@ -112,6 +112,7 @@ public class AddFriendFragment extends Fragment {
                 title.setText("通讯录");
                 ContactsFragment contactsFragment = new ContactsFragment();
                 transaction.replace(R.id.flFragment, contactsFragment);
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }

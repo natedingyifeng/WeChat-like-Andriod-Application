@@ -155,7 +155,8 @@ public class LoginActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-            }
+                LoginActivity.this.finish();
+             }
         };
     }
 

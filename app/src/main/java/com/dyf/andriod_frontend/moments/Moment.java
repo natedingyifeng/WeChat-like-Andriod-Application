@@ -37,7 +37,9 @@ public class Moment {
 
     public Moment(JSONObject jsonObject) throws JSONException {
         // TODO 根据后端提供的http回复来构造Moment
-        this.content = jsonObject.getString("content");
+        if(jsonObject.has("content"))
+            this.content = jsonObject.getString("content");
+        else this.content = "";
         this.createdAt = jsonObject.getString("createdAt");
         this.id = jsonObject.getString("id");
         this.lastModifiedAt = jsonObject.getString("lastModifiedAt");

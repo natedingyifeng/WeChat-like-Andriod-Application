@@ -127,6 +127,20 @@
                     android:layout_height="match_parent" />
             </TableLayout>
 
+            <Button
+                android:id="@+id/user_add_friend_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加好友"
+                android:layout_marginTop="60dp"/>
+
+            <Button
+                android:id="@+id/user_delete_friend_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="删除好友" />
+
         </LinearLayout>
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
