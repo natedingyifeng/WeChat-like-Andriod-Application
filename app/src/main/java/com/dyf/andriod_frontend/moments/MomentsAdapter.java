@@ -118,6 +118,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                     .into(holder.imageViews[i]);
         }
 
+        // 播放视频
         if(type == -1){
 
             holder.videoView.setUp(images.get(0), "视频", Jzvd.SCREEN_NORMAL);

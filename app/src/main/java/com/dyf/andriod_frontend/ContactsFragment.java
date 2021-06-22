@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -70,16 +71,21 @@ public class ContactsFragment extends ListFragment {
     public String id;
     private Handler handler;
 
+    private ListView ContactLstView;
+    private RecyclerView friendRequestRecyclerView;
+
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
     private ContactsMessageReceiver contactMessageReceiver;
 
     private class ContactsMessageReceiver extends BroadcastReceiver {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onReceive(Context context, Intent intent) {
             String message=intent.getStringExtra("message");
             try {
+                // TODO 获得好友请求 WebSocket
                 JSONArray json_contact = new JSONArray(message);
                 Log.d("sentuser", json_contact.getJSONObject(0).getJSONObject("sentUser").get("id").toString());
                 sendNotificationOfNewFriend(json_contact.getJSONObject(0).getJSONObject("sentUser").get("username").toString());
@@ -88,6 +94,7 @@ public class ContactsFragment extends ListFragment {
             }
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         private void sendNotificationOfNewFriend(String name) {
             Intent intent = new Intent(getContext(), NotificationActivity.class);
             PendingIntent pi = PendingIntent.getActivities(getContext(), 0, new Intent[]{intent}, 0);
@@ -146,6 +153,7 @@ public class ContactsFragment extends ListFragment {
         return fragment;
     }
 
+    @SuppressLint("HandlerLeak")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
