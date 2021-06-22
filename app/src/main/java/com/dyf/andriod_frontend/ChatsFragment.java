@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 
@@ -214,7 +216,14 @@ public class ChatsFragment extends ListFragment {
                             try {
                                 JSONObject groupMessages = groups.getJSONObject(i).getJSONArray("groupMessages").getJSONObject(groups.getJSONObject(i).getJSONArray("groupMessages").length() - 1);
                                 Log.d("12", groupMessages.toString());
-                                data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, groupMessages.getString("content"), "", 1, groups.getJSONObject(i).getString("id")));
+                                if(isHttpUrl(groupMessages.getString("content")))
+                                {
+                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, "点击查看", "", 1, groups.getJSONObject(i).getString("id")));
+                                }
+                                else
+                                {
+                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, groupMessages.getString("content"), "", 1, groups.getJSONObject(i).getString("id")));
+                                }
                             }
                             catch (JSONException e)
                             {
@@ -334,6 +343,20 @@ public class ChatsFragment extends ListFragment {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(timeMillisl);
         return simpleDateFormat.format(date);
+    }
+
+    public static boolean isHttpUrl(String urls) {
+        boolean isurl = false;
+        String regex = "(((https|http)?://)?([a-z0-9]+[.])|(www.))"
+                + "\\w+[.|\\/]([a-z0-9]{0,})?[[.]([a-z0-9]{0,})]+((/[\\S&&[^,;\u4E00-\u9FA5]]+)+)?([.][a-z0-9]{0,}+|/?)";//设置正则表达式
+
+        Pattern pat = Pattern.compile(regex.trim());//比对
+        Matcher mat = pat.matcher(urls.trim());
+        isurl = mat.matches();//判断是否匹配
+        if (isurl) {
+            isurl = true;
+        }
+        return isurl;
     }
 
 }

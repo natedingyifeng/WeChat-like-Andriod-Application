@@ -197,12 +197,13 @@ public class ContactsFragment extends ListFragment {
                     if (jsonObject.getBoolean("success")){
                         // 获取用户数据
                         JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
-                        JSONArray friends =user.getJSONArray("contacts");
-                        Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
-                        for (int i = 0; i < friends.length(); i++)
-                        {
-                            contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
-                        }
+                        try {
+                            JSONArray friends = user.getJSONArray("contacts");
+                            Log.d("len", friends.getJSONObject(0).getString("username") + "(" + friends.getJSONObject(0).getString("nickname") + ")");
+                            for (int i = 0; i < friends.length(); i++) {
+                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                            }
+                        } catch (JSONException e) {}
                         handler.sendEmptyMessage(1);
                     }else{
                         Looper.prepare();

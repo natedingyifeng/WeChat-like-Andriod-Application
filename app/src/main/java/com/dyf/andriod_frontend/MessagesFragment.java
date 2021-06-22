@@ -120,6 +120,8 @@ public class MessagesFragment extends Fragment {
     private Handler handler_chats;
     private Handler handler_group_chats;
     private Handler handler_images;
+    private Handler handler_audio;
+    private Handler handler_video;
     public MainActivity mainActivity;
     private String filepath;
     private String filename;
@@ -139,13 +141,38 @@ public class MessagesFragment extends Fragment {
                 if(chat_type == 0) {
                     if (json_contact.getJSONObject(0).getString("messageType").equals("TEXT")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 0);
-                        data.add(new MessageA(talkToName, R.drawable.contacts_6, json_contact.getJSONObject(0).getString("content"), 0));
-                        messageAdapter.notifyDataSetChanged();
+                        if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, json_contact.getJSONObject(0).getString("content"), 0));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if (json_contact.getJSONObject(0).getString("messageType").equals("PHOTO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 1);
+                        if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 3, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if (json_contact.getJSONObject(0).getString("messageType").equals("VIDEO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 2);
+                        if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 5, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if (json_contact.getJSONObject(0).getString("messageType").equals("AUDIO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 3);
+                        if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 7, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
                 else if(chat_type == 1)
                 {
-                    if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId))
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                     {
                         data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, json_contact.getJSONObject(0).getString("content"), 0));
                         messageAdapter.notifyDataSetChanged();
@@ -236,6 +263,28 @@ public class MessagesFragment extends Fragment {
                 manager.notify(1, notification);
             }
             else if(type==3) {
+                Notification notification = new Notification.Builder(getContext())
+                        .setContentTitle(name)
+                        .setContentText("[音频]")
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.mipmap.ic_play)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_play))
+                        .setContentIntent(pi)
+                        .setAutoCancel(true) // 取消通知
+                        .setSound(Uri.fromFile(new File("/system/media/audio/notifications/Simple.ogg"))) // 通知铃声
+                        //        .setSound(Uri.fromFile(new File("/system/media/audio/ringtones/Luna.ogg")))
+                        .setVibrate(new long[]{0, 1000, 1000, 1000})
+                        .setLights(Color.GREEN, 1000, 1000) // LED灯
+                        .setChannelId("AppTestNotificationId")
+                        //        .setLights(Color.GREEN, 1000, 1000)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        //        .setStyle(new NotificationCompat.BigTextStyle().bigText("Learn how to build notifications, send and sync data, and use voice actions. Get the official Android IDE and developer tools to build apps for Android."))
+//                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.contacts_6)))
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .build();
+                manager.notify(1, notification);
+            }
+            else if(type==4) {
                 Notification notification = new Notification.Builder(getContext())
                         .setContentTitle(name)
                         .setContentText("[位置]")
@@ -456,12 +505,38 @@ public class MessagesFragment extends Fragment {
                             JSONArray messages = jsonObject.getJSONArray("messages");
                             for (int j = 0; j < messages.length(); j++) {
                                 int k = 0;
-                                if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                                    k = 0;
-                                } else {
-                                    k = 1;
+                                if(messages.getJSONObject(j).getString("messageType").equals("TEXT")) {
+                                    if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                        k = 0;
+                                    } else {
+                                        k = 1;
+                                    }
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
                                 }
-                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
+                                else if(messages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
+                                    if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                        k = 2;
+                                    } else {
+                                        k = 3;
+                                    }
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                }
+                                else if(messages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
+                                    if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                        k = 4;
+                                    } else {
+                                        k = 5;
+                                    }
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                }
+                                else if(messages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
+                                    if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                        k = 6;
+                                    } else {
+                                        k = 7;
+                                    }
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                }
                             }
                             handler_chats.sendEmptyMessage(1);
                         } else {
@@ -523,12 +598,38 @@ public class MessagesFragment extends Fragment {
                                 for(int j=0;j<groupMessages.length();j++)
                                 {
                                     int k = 0;
-                                    if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
-                                        k = 1;
-                                    } else {
-                                        k = 0;
+                                    if(groupMessages.getJSONObject(j).getString("messageType").equals("TEXT")) {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
+                                            k = 1;
+                                        } else {
+                                            k = 0;
+                                        }
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k));
                                     }
-                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k));
+                                    else if(groupMessages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
+                                            k = 2;
+                                        } else {
+                                            k = 3;
+                                        }
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                    }
+                                    else if(groupMessages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
+                                            k = 4;
+                                        } else {
+                                            k = 5;
+                                        }
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                    }
+                                    else if(groupMessages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
+                                            k = 6;
+                                        } else {
+                                            k = 7;
+                                        }
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                    }
                                 }
                             }
                             catch (JSONException e)
@@ -589,8 +690,25 @@ public class MessagesFragment extends Fragment {
                         String username = sp.getString("username", "");
                         mainActivity.sendMsg(ws_msg_send.toString());
                         data.add(new MessageA(username, R.drawable.contacts_6, v.getText().toString(), 1));
+                        messageAdapter.notifyDataSetChanged();
                     }
-                    messageAdapter.notifyDataSetChanged();
+                    else if(chat_type == 1)
+                    {
+                        JSONObject ws_msg_send = new JSONObject();
+                        try {
+                            ws_msg_send.put("bizType", "GROUP_SEND_TEXT");
+                            ws_msg_send.put("content", v.getText().toString());
+                            ws_msg_send.put("groupId", talkToId);
+                            ws_msg_send.put("messageType", "TEXT");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                        String username = sp.getString("username", "");
+                        mainActivity.sendMsg(ws_msg_send.toString());
+                        data.add(new MessageA(username, R.drawable.contacts_6, v.getText().toString(), 1));
+                        messageAdapter.notifyDataSetChanged();
+                    }
                     edit_text.setText("");
                     return true;
                 }
@@ -615,7 +733,11 @@ public class MessagesFragment extends Fragment {
         voice_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recordAudio();
+                try {
+                    recordAudio();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         Button location_icon = getActivity().findViewById(R.id.location_icon);
@@ -663,7 +785,7 @@ public class MessagesFragment extends Fragment {
 //        intent.setAction(Intent.ACTION_PICK);
 //        intent.setData(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 //        startActivityForResult(intent, 222);
-        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 222);
     }
 
@@ -672,7 +794,7 @@ public class MessagesFragment extends Fragment {
         startActivityForResult(intent, 111);
     }
 
-    private void uploadFile(String path) throws IOException {
+    private void uploadImage(String path) throws IOException {
         HttpRequest.sendOkHttpUploadFile("file/upload", new okhttp3.Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -695,7 +817,7 @@ public class MessagesFragment extends Fragment {
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"图片错误", Toast.LENGTH_SHORT).show();
                     }
-//                    handler_images.sendEmptyMessage(1);
+                    handler_images.sendEmptyMessage(1);
                     Looper.loop();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -706,16 +828,158 @@ public class MessagesFragment extends Fragment {
 
             }
         }, path);
-//        handler_images = new Handler(){
-//            @SuppressLint("HandlerLeak")
-//            public void handleMessage(Message msg){
-//                super.handleMessage(msg);
-//
-//            }
-//        };
     }
 
-    public void recordAudio() {
+    private void uploadAudio(String path) throws IOException {
+        HttpRequest.sendOkHttpUploadFile("file/upload", new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        filename = jsonObject.getString("fileName");
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), "音频"+"上传成功", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"音频错误", Toast.LENGTH_SHORT).show();
+                    }
+                    handler_audio.sendEmptyMessage(1);
+                    Looper.loop();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+            }
+        }, path);
+        handler_audio = new Handler() {
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(chat_type == 0) {
+                    JSONObject ws_msg_send = new JSONObject();
+                    try {
+                        ws_msg_send.put("bizType", "SEND_TEXT");
+                        ws_msg_send.put("content", HttpRequest.media_url + filename);
+                        ws_msg_send.put("targetUserId", talkToId);
+                        ws_msg_send.put("messageType", "AUDIO");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    mainActivity.sendMsg(ws_msg_send.toString());
+                    data.add(new MessageA(username, R.drawable.contacts_6, 7, HttpRequest.media_url + filename));
+                    messageAdapter.notifyDataSetChanged();
+                }
+                else if(chat_type == 1) {
+                    JSONObject ws_msg_send = new JSONObject();
+                    try {
+                        ws_msg_send.put("bizType", "GROUP_SEND_TEXT");
+                        ws_msg_send.put("content", HttpRequest.media_url + filename);
+                        ws_msg_send.put("groupId", talkToId);
+                        ws_msg_send.put("messageType", "AUDIO");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    mainActivity.sendMsg(ws_msg_send.toString());
+                    data.add(new MessageA(username, R.drawable.contacts_6, 7, HttpRequest.media_url + filename));
+                    messageAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+    }
+
+    private void uploadVideo(String path) throws IOException {
+        HttpRequest.sendOkHttpUploadFile("file/upload", new okhttp3.Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        filename = jsonObject.getString("fileName");
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), "音频"+"上传成功", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"音频错误", Toast.LENGTH_SHORT).show();
+                    }
+                    handler_video.sendEmptyMessage(1);
+                    Looper.loop();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+
+            }
+        }, path);
+        handler_video = new Handler() {
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(chat_type == 0) {
+                    JSONObject ws_msg_send = new JSONObject();
+                    try {
+                        ws_msg_send.put("bizType", "SEND_TEXT");
+                        ws_msg_send.put("content", HttpRequest.media_url + filename);
+                        ws_msg_send.put("targetUserId", talkToId);
+                        ws_msg_send.put("messageType", "VIDEO");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    mainActivity.sendMsg(ws_msg_send.toString());
+                    data.add(new MessageA(username, R.drawable.contacts_6, 5, HttpRequest.media_url + filename));
+                    messageAdapter.notifyDataSetChanged();
+                }
+                else if(chat_type == 1)
+                {
+                    JSONObject ws_msg_send = new JSONObject();
+                    try {
+                        ws_msg_send.put("bizType", "GROUP_SEND_TEXT");
+                        ws_msg_send.put("content", HttpRequest.media_url + filename);
+                        ws_msg_send.put("groupId", talkToId);
+                        ws_msg_send.put("messageType", "VIDEO");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    mainActivity.sendMsg(ws_msg_send.toString());
+                    data.add(new MessageA(username, R.drawable.contacts_6, 5, HttpRequest.media_url + filename));
+                    messageAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+    }
+
+    public void recordAudio() throws IOException {
         if(mMediaRecorderUtils.isRecording() == false) {
             mMediaRecorderUtils.start();
         }
@@ -724,8 +988,7 @@ public class MessagesFragment extends Fragment {
             mMediaRecorderUtils.stop();
             String audio_path = mMediaRecorderUtils.getPath();
             Log.d("path", audio_path);
-            data.add(new MessageA(getString(R.string.nickname6), R.drawable.contacts_6, 7, audio_path));
-            messageAdapter.notifyDataSetChanged();
+            uploadAudio(audio_path);
         }
     }
 
@@ -740,24 +1003,6 @@ public class MessagesFragment extends Fragment {
         mapView.onDestroy();
         baiduMap.setMyLocationEnabled(false);
         mMediaRecorderUtils.onDestroy();
-    }
-
-    private File uri2File(Uri uri) {
-        String img_path;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor actualimagecursor = getActivity().managedQuery(uri, proj, null,
-                null, null);
-        if (actualimagecursor == null) {
-            img_path = uri.getPath();
-        } else {
-            int actual_image_column_index = actualimagecursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            actualimagecursor.moveToFirst();
-            img_path = actualimagecursor
-                    .getString(actual_image_column_index);
-        }
-        File file = new File(img_path);
-        return file;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -780,78 +1025,48 @@ public class MessagesFragment extends Fragment {
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     filepath = cursor.getString(columnIndex);
                     cursor.close();
-//                    uploadFile(filepath);
-                    HashMap<String, String> params = new HashMap<>();
-                    params.put("talkToUserId", talkToId);
-                    params.put("messageType", "PHOTO");
-                    params.put("file", filepath);
-                    HttpRequest.sendOkHttpPostRequest("chat/file", new Callback() {
-                        @Override
-                        public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                            Looper.prepare();
-                            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        }
-
-                        @Override
-                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                            String resStr = response.body().string();
-                            Log.e("response", resStr);
-                            try {
-                                JSONObject jsonObject = new JSONObject(resStr);
-                                if (jsonObject.getBoolean("success")) {
-                                    JSONArray messages = jsonObject.getJSONArray("messages");
-                                    for (int j = 0; j < messages.length(); j++) {
-                                        int k = 0;
-                                        if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                                            k = 0;
-                                        } else {
-                                            k = 1;
-                                        }
-                                        data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
-                                    }
-                                    handler_images.sendEmptyMessage(1);
-                                } else {
-                                    Looper.prepare();
-                                    Toast.makeText(getActivity().getApplicationContext(), "好友消息发送失败", Toast.LENGTH_SHORT).show();
-                                    Looper.loop();
-                                    handler_images.sendEmptyMessage(1);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Looper.prepare();
-                                Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
-                                Looper.loop();
-                            }
-                        }
-                    }, params);
-
-                    handler_chats = new Handler() {
-                        @SuppressLint("HandlerLeak")
-                        public void handleMessage(Message msg) {
-                            super.handleMessage(msg);
-                            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-                            String username = sp.getString("username", "");
-                            data.add(new MessageA(username, R.drawable.contacts_6, 3, imageUri));
-                            messageAdapter.notifyDataSetChanged();
-                        }
-                    };
-//                    JSONObject ws_msg_send = new JSONObject();
-//                    try {
-//                        ws_msg_send.put("bizType", "SEND_FILE");
-//                        ws_msg_send.put("file", file);
-//                        ws_msg_send.put("targetUserId", talkToId);
-//                        ws_msg_send.put("messageType", "PHOTO");
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-//                    String username = sp.getString("username", "");
-//                    mainActivity.sendMsg(ws_msg_send.toString());
-
+                    uploadImage(filepath);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                handler_images = new Handler() {
+                    @SuppressLint("HandlerLeak")
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        if(chat_type == 0) {
+                            JSONObject ws_msg_send = new JSONObject();
+                            try {
+                                ws_msg_send.put("bizType", "SEND_TEXT");
+                                ws_msg_send.put("content", HttpRequest.media_url + filename);
+                                ws_msg_send.put("targetUserId", talkToId);
+                                ws_msg_send.put("messageType", "PHOTO");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                            String username = sp.getString("username", "");
+                            mainActivity.sendMsg(ws_msg_send.toString());
+                            data.add(new MessageA(username, R.drawable.contacts_6, 3, HttpRequest.media_url + filename));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                        else if(chat_type == 1) {
+                            JSONObject ws_msg_send = new JSONObject();
+                            try {
+                                ws_msg_send.put("bizType", "GROUP_SEND_TEXT");
+                                ws_msg_send.put("content", HttpRequest.media_url + filename);
+                                ws_msg_send.put("groupId", talkToId);
+                                ws_msg_send.put("messageType", "PHOTO");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                            String username = sp.getString("username", "");
+                            mainActivity.sendMsg(ws_msg_send.toString());
+                            data.add(new MessageA(username, R.drawable.contacts_6, 3, HttpRequest.media_url + filename));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                };
                 break;
             case 222:
                 if (resultCode == 0) {
@@ -860,57 +1075,13 @@ public class MessagesFragment extends Fragment {
                 }
                 try {
                     Uri uri = data_intent.getData();
-                    Log.d("MainActivity", "URL: " + uri);
-                    ContentResolver cr = getActivity().getContentResolver();
-                    Cursor cursor = cr.query(uri, null, null, null, null);
-                    Log.d("MainActivity", "URL: " + uri);
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getActivity().getContentResolver().query(uri,filePathColumn, null, null, null);
                     cursor.moveToFirst();
-                    String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
-                    Log.d("MainActivity", "filePath: " + filePath);
-                    data.add(new MessageA(getString(R.string.nickname6), R.drawable.contacts_6, 5, filePath));
-                    messageAdapter.notifyDataSetChanged();
-//                    Log.d("TAG",uri.toString());
-//                    ContentResolver cr = getActivity().getContentResolver();
-//                    Cursor cursor = cr.query(uri, null, null, null, null);
-//                    if (cursor != null) {
-//                        if (cursor.moveToFirst()) {
-//                            // 视频ID:MediaStore.Audio.Media._ID
-//                            int videoId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
-//                            // 视频名称：MediaStore.Audio.Media.TITLE
-//                            String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
-//                            // 视频路径：MediaStore.Audio.Media.DATA
-//                            String videoPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
-//                            // 视频时长：MediaStore.Audio.Media.DURATION
-////                            int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
-//                            // 视频大小：MediaStore.Audio.Media.SIZE
-//                            long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
-//
-//                            // 视频缩略图路径：MediaStore.Images.Media.DATA
-//                            String imagePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-//                            // 缩略图ID:MediaStore.Audio.Media._ID
-//                            int imageId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
-//                            // 方法一 Thumbnails 利用createVideoThumbnail 通过路径得到缩略图，保持为视频的默认比例
-//                            // 第一个参数为 ContentResolver，第二个参数为视频缩略图ID， 第三个参数kind有两种为：MICRO_KIND和MINI_KIND 字面意思理解为微型和迷你两种缩略模式，前者分辨率更低一些。
-////                            Bitmap bitmap1 = MediaStore.Video.Thumbnails.getThumbnail(cr, imageId, MediaStore.Video.Thumbnails.MICRO_KIND, null);
-//
-//                            // 方法二 ThumbnailUtils 利用createVideoThumbnail 通过路径得到缩略图，保持为视频的默认比例
-//                            // 第一个参数为 视频/缩略图的位置，第二个依旧是分辨率相关的kind
-//                            Bitmap bitmap1 = ThumbnailUtils.createVideoThumbnail(imagePath, MediaStore.Video.Thumbnails.MICRO_KIND);
-//                            // 如果追求更好的话可以利用 ThumbnailUtils.extractThumbnail 把缩略图转化为的制定大小
-////                        ThumbnailUtils.extractThumbnail(bitmap, width,height ,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-//                            tv_VideoPath = videoPath;
-////                            tv_VideoDuration =  String.valueOf(duration);
-//                            tv_VideoSize = String.valueOf(size);
-//                            tv_VideoTitle = title;
-////                            setText(tv_VideoPath, "path", videoPath);
-////                            setText(tv_VideoDuration, "duration", String.valueOf(duration));
-////                            setText(tv_VideoSize, "size", String.valueOf(size));
-////                            setText(tv_VideoTitle, "title", title);
-////                            iv_VideoImage.setImageBitmap(bitmap1);
-//                            Log.d("TAG", tv_VideoPath);
-//                        }
-//                        cursor.close();
-//                    }
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    filepath = cursor.getString(columnIndex);
+                    cursor.close();
+                    uploadVideo(filepath);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

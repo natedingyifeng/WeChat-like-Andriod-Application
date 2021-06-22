@@ -8,7 +8,7 @@ public class MessageA {
     private final String content; //内容
     private final int avatarIcon; // 头像
     private final int componentType;
-    private final Uri content_image;
+    private final String content_image;
     private final String video_path;
 
     public MessageA(String nickname, int avatarIcon, String content, int componentType) {
@@ -19,7 +19,7 @@ public class MessageA {
         this.video_path = null;
     }
 
-    public MessageA(String nickname, int avatarIcon, int componentType, Uri content_image) {
+    public MessageA(String nickname, int avatarIcon, int componentType, String content_image) {
         this.avatarIcon = avatarIcon;
         this.content = "";
         this.componentType = componentType;
@@ -27,13 +27,13 @@ public class MessageA {
         this.video_path = null;
     }
 
-    public MessageA(String nickname, int avatarIcon, int componentType, String path) {
-        this.avatarIcon = avatarIcon;
-        this.content = "";
-        this.componentType = componentType;
-        this.content_image = null;
-        this.video_path = path;
-    }
+//    public MessageA(String nickname, String avatarIcon, int componentType, String path) {
+//        this.avatarIcon = avatarIcon;
+//        this.content = "";
+//        this.componentType = componentType;
+//        this.content_image = null;
+//        this.video_path = path;
+//    }
 
     public int getAvatarIcon() {
         return avatarIcon;
@@ -45,7 +45,7 @@ public class MessageA {
 
     public int getComponentType() { return componentType; }
 
-    public Uri getContentImage() { return content_image; }
+    public String getContentImage() { return content_image; }
 
-    public String getVideoPath() { return video_path; }
+//    public String getVideoPath() { return video_path; }
 }
