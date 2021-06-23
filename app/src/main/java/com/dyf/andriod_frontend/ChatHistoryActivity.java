@@ -246,28 +246,28 @@ public class ChatHistoryActivity extends AppCompatActivity {
                                 } else {
                                     k = 1;
                                 }
-                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k, messages.getJSONObject(j).getString("id")));
+                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), messages.getJSONObject(j).getString("content"), k, messages.getJSONObject(j).getString("id")));
                             } else if (messages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
                                 if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
                                     k = 2;
                                 } else {
                                     k = 3;
                                 }
-                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
+                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
                             } else if (messages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
                                 if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
                                     k = 4;
                                 } else {
                                     k = 5;
                                 }
-                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
+                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
                             } else if (messages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
                                 if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
                                     k = 6;
                                 } else {
                                     k = 7;
                                 }
-                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
+                                data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content"), messages.getJSONObject(j).getString("id")));
                             }
                         }
                         handler_chats.sendEmptyMessage(1);

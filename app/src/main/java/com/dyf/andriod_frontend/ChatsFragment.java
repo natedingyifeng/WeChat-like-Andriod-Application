@@ -109,7 +109,6 @@ public class ChatsFragment extends ListFragment {
             @SuppressLint("HandlerLeak")
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
-
                 getGroupChats();
             }
         };

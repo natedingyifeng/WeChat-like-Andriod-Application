@@ -207,28 +207,28 @@ public class GroupChatHistoryActivity extends AppCompatActivity {
                                     } else {
                                         k = 0;
                                     }
-                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k, groupMessages.getJSONObject(j).getString("id")));
+                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), groupMessages.getJSONObject(j).getString("content"), k, groupMessages.getJSONObject(j).getString("id")));
                                 } else if (groupMessages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
                                     if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
                                         k = 2;
                                     } else {
                                         k = 3;
                                     }
-                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
+                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
                                 } else if (groupMessages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
                                     if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
                                         k = 4;
                                     } else {
                                         k = 5;
                                     }
-                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
+                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"),groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
                                 } else if (groupMessages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
                                     if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
                                         k = 6;
                                     } else {
                                         k = 7;
                                     }
-                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
+                                    data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content"), groupMessages.getJSONObject(j).getString("id")));
                                 }
                             }
                         } catch (JSONException e) {

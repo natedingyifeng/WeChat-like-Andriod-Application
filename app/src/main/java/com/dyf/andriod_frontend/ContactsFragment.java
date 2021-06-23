@@ -195,7 +195,7 @@ public class ContactsFragment extends ListFragment {
                             JSONArray friends = user.getJSONArray("contacts");
                             Log.d("len", friends.getJSONObject(0).getString("username") + "(" + friends.getJSONObject(0).getString("nickname") + ")");
                             for (int i = 0; i < friends.length(); i++) {
-                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), friends.getJSONObject(i).getString("avatarUrl"), friends.getJSONObject(i).getString("id")));
                             }
                         } catch (JSONException e) {}
                         handler.sendEmptyMessage(1);
