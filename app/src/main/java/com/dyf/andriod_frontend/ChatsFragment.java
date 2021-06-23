@@ -197,6 +197,18 @@ public class ChatsFragment extends ListFragment {
 //        data.add(new Chat(getString(R.string.nickname5), R.drawable.contacts_5, "没事", "2021/01/05", 1));
         chatAdapter = new ChatAdapter(data,context);
         setListAdapter(chatAdapter);
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mainActivity.sendMsg(ws_msg_login.toString());
     }
 
     public void getGroupChats() {
@@ -315,7 +327,6 @@ public class ChatsFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         // Notification
-        mainActivity = (MainActivity ) getActivity();
 //        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
 //        String username = sp.getString("username", "");
 //        String password = sp.getString("password", "");

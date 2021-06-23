@@ -240,18 +240,18 @@ public class ContactsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity ) getActivity();
-        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-        String username = sp.getString("username", "");
-        String password = sp.getString("password", "");
-        JSONObject ws_msg_login = new JSONObject();
-        try {
-            ws_msg_login.put("bizType", "USER_LOGIN");
-            ws_msg_login.put("password", password);
-            ws_msg_login.put("username", username);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mainActivity.sendMsg(ws_msg_login.toString());
+//        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+//        String username = sp.getString("username", "");
+//        String password = sp.getString("password", "");
+//        JSONObject ws_msg_login = new JSONObject();
+//        try {
+//            ws_msg_login.put("bizType", "USER_LOGIN");
+//            ws_msg_login.put("password", password);
+//            ws_msg_login.put("username", username);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        mainActivity.sendMsg(ws_msg_login.toString());
         doRegisterReceiver();
         TextView title = getActivity().findViewById(R.id.title_text);
         title.setText(R.string.contacts);

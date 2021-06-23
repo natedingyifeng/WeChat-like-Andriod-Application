@@ -2,6 +2,7 @@ package com.dyf.andriod_frontend;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,6 +69,7 @@ public class GroupInfoFragment extends Fragment {
     private Handler handler_leave;
     private Button button_add;
     private Button button_leave;
+    private Button button_history;
     private String user_id;
     private int chattype;
     private String taketoname;
@@ -234,7 +236,29 @@ public class GroupInfoFragment extends Fragment {
                 transaction.commit();
             }
         });
+        button_history = getActivity().findViewById(R.id.button_group_messages_history);
+        button_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(),GroupChatHistoryActivity.class);
+                intent.putExtra("talkToId",group_id);
+                intent.putExtra("talkToName",taketoname);
+                startActivity(intent);
+            }
+        });
         button_add = getActivity().findViewById(R.id.button_addmorefriend);
+        button_add .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                title.setText("添加联系人");
+                AddNewGroupMemberFragment addgroupmemberFragment = new AddNewGroupMemberFragment();
+                addgroupmemberFragment.setInfo(group_id);
+                transaction.replace(R.id.flFragment, addgroupmemberFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
         button_leave = getActivity().findViewById(R.id.button_leavegroup);
         button_leave.setOnClickListener(new View.OnClickListener() {
             @Override
