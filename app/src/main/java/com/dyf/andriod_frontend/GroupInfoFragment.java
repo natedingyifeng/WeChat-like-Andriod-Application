@@ -150,7 +150,7 @@ public class GroupInfoFragment extends Fragment {
                         JSONArray groupMembers = groups.getJSONObject(index).getJSONArray("members");
                         for(int j=0;j<groupMembers.length();j++)
                         {
-                            data_icons.add(new Icons(groupMembers.getJSONObject(j).getString("username"), R.drawable.group_chat_avatar));
+                            data_icons.add(new Icons(groupMembers.getJSONObject(j).getString("username"), groupMembers.getJSONObject(j).getString("avatarUrl")));
                         }
                         handler_group_chats.sendEmptyMessage(1);
                     } else {
@@ -237,6 +237,7 @@ public class GroupInfoFragment extends Fragment {
             }
         });
         button_history = getActivity().findViewById(R.id.button_group_messages_history);
+        button_history.setVisibility(View.INVISIBLE);
         button_history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -9,7 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import java.util.List;
 
@@ -51,7 +53,16 @@ public class ChatAdapter extends BaseAdapter {
         ImageView icon = (ImageView) convertView.findViewById(R.id.chat_avatar_icon);
         icon.setFocusable(false);
         icon.setFocusableInTouchMode(false);
-        icon.setImageResource(chat.getAvatarIcon());
+        if(chat.getChatType() == 0)
+        {
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+chat.getAvatarIcon())
+                    .into(icon);
+        }
+        else {
+           icon.setImageResource(chat.getIcon());
+        }
         TextView nickname = (TextView) convertView.findViewById(R.id.nickname_text);
         nickname.setFocusable(false);
         nickname.setFocusableInTouchMode(false);

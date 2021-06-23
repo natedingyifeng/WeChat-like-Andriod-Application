@@ -37,6 +37,7 @@ public class FriendRequestActivity extends AppCompatActivity {
         Button titleBack2 = findViewById(R.id.title_back2);
         titleBack2.setVisibility(View.INVISIBLE);
         Button titleBack = (Button) findViewById(R.id.title_back);
+        titleBack.setVisibility(View.VISIBLE);
         titleBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.contact.Contact;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -188,7 +189,11 @@ public class AddNewGroupMemberFragment extends Fragment {
             }else{
                 viewHolder.checkBox.setChecked(false);
             }
-            viewHolder.imageView.setImageResource(contact.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url + contact.getIcon())
+                    .into(viewHolder.imageView);
+//            viewHolder.imageView.setImageResource(contact.getAvatarIcon());
             viewHolder.textView.setText(contact.getNickname());
             return convertView;
         }
@@ -265,7 +270,7 @@ public class AddNewGroupMemberFragment extends Fragment {
                         Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
                         for (int i = 0; i < friends.length(); i++)
                         {
-                            data.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                            data.add(new Contact(friends.getJSONObject(i).getString("username"), friends.getJSONObject(i).getString("avatarUrl"), friends.getJSONObject(i).getString("id")));
                         }
                         handler.sendEmptyMessage(1);
                     }else{

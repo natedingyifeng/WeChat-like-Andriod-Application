@@ -10,12 +10,14 @@ import com.dyf.andriod_frontend.Setting.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.net.http.HttpResponseCache;
@@ -26,6 +28,7 @@ import butterknife.ButterKnife;
 
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
@@ -34,6 +37,8 @@ import android.widget.Toast;
 import com.dyf.andriod_frontend.moments.MomentsFragment;
 
 import org.java_websocket.client.WebSocketClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity  {
             binder = (WebSocketService.MyWebSocketClientBinder) iBinder;
             myWebSClientService = binder.getService();
             client = WebSocketService.socketClient;
+//            msgHandler.sendEmptyMessage(1);
         }
 
         @Override
@@ -167,17 +173,9 @@ public class MainActivity extends AppCompatActivity  {
                 }
         );
 
-//        // 消息处理
-//        msgHandler = new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                super.handleMessage(msg);
-//                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_LONG).show();
-//            }
-//        };
 //
 //        // 初始化websocket
-//        WebSocketService.initSocket();
+//        WebSocketService.initSocket()
 
         Log.d("position", "String.valueOf(position)");
 

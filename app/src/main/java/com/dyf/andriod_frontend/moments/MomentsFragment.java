@@ -1,7 +1,9 @@
 package com.dyf.andriod_frontend.moments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dyf.andriod_frontend.MainActivity;
 import com.dyf.andriod_frontend.R;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 
@@ -85,6 +88,18 @@ public class MomentsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // 右上角的弹出菜单
+        SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ((MainActivity)getActivity()).sendMsg(ws_msg_login.toString());
         ImageButton releaseBtn = view.findViewById(R.id.moments_release_btn);
         releaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override

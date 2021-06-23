@@ -17,8 +17,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.dyf.andriod_frontend.MainActivity;
 import com.dyf.andriod_frontend.R;
 import com.dyf.andriod_frontend.utils.HttpRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +57,18 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         TextView title = getActivity().findViewById(R.id.title_text);
         title.setText("个人信息");
+        SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ((MainActivity)getActivity()).sendMsg(ws_msg_login.toString());
     }
 
     @Override

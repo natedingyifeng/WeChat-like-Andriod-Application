@@ -10,7 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import java.util.List;
 
@@ -55,7 +57,10 @@ public class IconsAdapter extends RecyclerView.Adapter<IconsAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Icons icon = mIconsList.get(position);
-        holder.iconsImage.setImageResource(icon.getAvatarIcon());
+        Glide
+                .with(Context)
+                .load(HttpRequest.media_url+icon.getAvatarIcon())
+                .into(holder.iconsImage);
         holder.iconName.setText(icon.getName());
     }
 

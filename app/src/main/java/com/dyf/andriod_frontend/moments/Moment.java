@@ -43,6 +43,7 @@ public class Moment {
         this.createdAt = jsonObject.getString("createdAt");
         this.id = jsonObject.getString("id");
         this.lastModifiedAt = jsonObject.getString("lastModifiedAt");
+//        this.lastModifiedAt = jsonObject.getString("lastModifiedAt");
         this.momentsOwner = new User(jsonObject.getJSONObject("postOwner"));
         this.postType = jsonObject.getString("postType");
 

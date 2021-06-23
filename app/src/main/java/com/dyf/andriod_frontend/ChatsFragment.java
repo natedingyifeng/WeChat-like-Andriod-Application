@@ -74,6 +74,7 @@ public class ChatsFragment extends ListFragment {
     private List<Chat> data;
     private ListView listView;
     private LinkedList<String> contacts_id;
+    private LinkedList<String> contacts_avatar;
     private LinkedList<String> contacts_name;
     private Handler handler;
     private Handler handler_chats;
@@ -109,18 +110,6 @@ public class ChatsFragment extends ListFragment {
             @SuppressLint("HandlerLeak")
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
-                SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-                String username = sp.getString("username", "");
-                String password = sp.getString("password", "");
-                JSONObject ws_msg_login = new JSONObject();
-                try {
-                    ws_msg_login.put("bizType", "USER_LOGIN");
-                    ws_msg_login.put("password", password);
-                    ws_msg_login.put("username", username);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mainActivity.sendMsg(ws_msg_login.toString());
                 getGroupChats();
             }
         };
@@ -139,6 +128,7 @@ public class ChatsFragment extends ListFragment {
             }
         };
         contacts_id = new LinkedList<>();
+        contacts_avatar = new LinkedList<>();
         contacts_name = new LinkedList<>();
         data = new ArrayList<Chat>();
 
@@ -173,13 +163,14 @@ public class ChatsFragment extends ListFragment {
                         {
                             contacts_id.add(friends.getJSONObject(i).getString("id"));
                             contacts_name.add(friends.getJSONObject(i).getString("username"));
+                            contacts_avatar.add(friends.getJSONObject(i).getString("avatarUrl"));
                         }
                         handler.sendEmptyMessage(1);
                     }else{
+                        handler.sendEmptyMessage(1);
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"好友列表获取失败", Toast.LENGTH_SHORT).show();
                         Looper.loop();
-                        handler.sendEmptyMessage(1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -229,7 +220,7 @@ public class ChatsFragment extends ListFragment {
                 if (resStr.charAt(resStr.length()-1) != '}'){
                     resStr = resStr + "}";
                 }
-                Log.e("response", resStr);
+                Log.e("response", resStr+"group/get");
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if (jsonObject.getBoolean("success")){
@@ -254,10 +245,10 @@ public class ChatsFragment extends ListFragment {
                         }
                         handler_group_chats.sendEmptyMessage(1);
                     }else{
+                        handler_group_chats.sendEmptyMessage(1);
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"群聊消息获取失败", Toast.LENGTH_SHORT).show();
                         Looper.loop();
-                        handler_group_chats.sendEmptyMessage(1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -276,6 +267,7 @@ public class ChatsFragment extends ListFragment {
             params.put("talkToUserId", contacts_id.get(i));
             String talkToId_tem = contacts_id.get(i);
             String talkToName_tem = contacts_name.get(i);
+            String talkToAvatar_tem = contacts_avatar.get(i);
             Log.e("request", contacts_id.get(i)+contacts_name.get(i));
 
             HttpRequest.sendOkHttpPostRequest("chat/get", new Callback() {
@@ -292,21 +284,21 @@ public class ChatsFragment extends ListFragment {
                     if (resStr.charAt(resStr.length()-1) != '}'){
                         resStr = resStr + "}";
                     }
-                    Log.e("response", resStr);
+                    Log.e("response", "chat/get"+resStr);
                     try {
                         JSONObject jsonObject = new JSONObject(resStr);
                         if (jsonObject.getBoolean("success")){
                             JSONArray messages = jsonObject.getJSONArray("messages");
                             if(messages.length()>0) {
-                                data.add(new Chat(talkToName_tem, R.drawable.contacts_1, messages.getJSONObject(messages.length() - 1).getString("content"), formatTime(messages.getJSONObject(messages.length() - 1).getString("createdAt")), talkToId_tem));
+                                data.add(new Chat(talkToName_tem, talkToAvatar_tem, messages.getJSONObject(messages.length() - 1).getString("content"), formatTime(messages.getJSONObject(messages.length() - 1).getString("createdAt")), talkToId_tem));
 //                            Log.d("messages", messages.toString());
                                 handler_chats.sendEmptyMessage(1);
                             }
                         }else{
-                            Looper.prepare();
-                            Toast.makeText(getActivity().getApplicationContext(),"好友消息获取失败", Toast.LENGTH_SHORT).show();
-                            Looper.loop();
                             handler_chats.sendEmptyMessage(1);
+//                            Looper.prepare();
+//                            Toast.makeText(getActivity().getApplicationContext(),"好友消息获取失败", Toast.LENGTH_SHORT).show();
+//                            Looper.loop();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -330,18 +322,18 @@ public class ChatsFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         // Notification
-//        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-//        String username = sp.getString("username", "");
-//        String password = sp.getString("password", "");
-//        JSONObject ws_msg_login = new JSONObject();
-//        try {
-//            ws_msg_login.put("bizType", "USER_LOGIN");
-//            ws_msg_login.put("password", password);
-//            ws_msg_login.put("username", username);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        mainActivity.sendMsg(ws_msg_login.toString());
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mainActivity.sendMsg(ws_msg_login.toString());
 //        handler_ws.sendEmptyMessage(1);
 //
 //        handler_ws = new Handler(){

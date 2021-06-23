@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 
 import java.util.LinkedList;
 
@@ -49,14 +50,16 @@ public class ContactAdapter extends BaseAdapter {
         TextView nickname = (TextView) convertView.findViewById(R.id.contact_nickname_text);
         nickname.setText(contact.getNickname());
         ImageView avatarIcon = (ImageView) convertView.findViewById(R.id.contact_avatar_icon);
-//        if(data.get(position).getType()==0)
-//        {
-//        Glide
-//                .with(context)
-//                .load(contact.getAvatarIcon())
-//                .into(avatarIcon);
-//        }
-        avatarIcon.setImageResource(contact.getAvatarIcon());
+        if(data.get(position).getType()==0)
+        {
+        Glide
+                .with(context)
+                .load(HttpRequest.media_url + contact.getIcon())
+                .into(avatarIcon);
+        }
+        else {
+            avatarIcon.setImageResource(contact.getAvatarIcon());
+        }
         return convertView;
     }
 }

@@ -7,21 +7,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -59,16 +56,13 @@ import com.baidu.mapapi.model.LatLng;
 import com.dyf.andriod_frontend.message.MessageA;
 import com.dyf.andriod_frontend.message.MessageAdapter;
 import com.dyf.andriod_frontend.utils.HttpRequest;
+import com.dyf.andriod_frontend.utils.MediaRecorderUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 //import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,6 +119,7 @@ public class MessagesFragment extends Fragment {
     public MainActivity mainActivity;
     private String filepath;
     private String filename;
+    private String avatar;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
@@ -142,36 +137,71 @@ public class MessagesFragment extends Fragment {
                     if (json_contact.getJSONObject(0).getString("messageType").equals("TEXT")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 0);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, json_contact.getJSONObject(0).getString("content"), 0));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(talkToName, json_contact.getJSONObject(0).getJSONObject("fromUser").getString("avatarUrl"), json_contact.getJSONObject(0).getString("content"), 0));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("PHOTO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 1);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 2, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(talkToName, json_contact.getJSONObject(0).getJSONObject("fromUser").getString("avatarUrl"), 2, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("VIDEO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 2);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 3, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(talkToName, json_contact.getJSONObject(0).getJSONObject("fromUser").getString("avatarUrl"), 3, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("AUDIO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 3);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 6, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(talkToName, json_contact.getJSONObject(0).getJSONObject("fromUser").getString("avatarUrl"), 6, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("LOCATION")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 4);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 8, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(talkToName, json_contact.getJSONObject(0).getJSONObject("fromUser").getString("avatarUrl"), 8, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 }
@@ -183,40 +213,75 @@ public class MessagesFragment extends Fragment {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 0);
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
-                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, json_contact.getJSONObject(0).getString("content"), 0));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("avatarUrl"), json_contact.getJSONObject(0).getString("content"), 0));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if(json_contact.getJSONObject(0).getString("messageType").equals("PHOTO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 1);
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
-                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 2, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"),json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("avatarUrl"), 2, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if(json_contact.getJSONObject(0).getString("messageType").equals("VIDEO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 2);
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
-                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 4, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("avatarUrl"), 4, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if(json_contact.getJSONObject(0).getString("messageType").equals("AUDIO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 3);
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
-                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 6, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("avatarUrl"), 6, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else if(json_contact.getJSONObject(0).getString("messageType").equals("LOCATION")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 4);
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
-                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 8, json_contact.getJSONObject(0).getString("content")));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("avatarUrl"), 8, json_contact.getJSONObject(0).getString("content")));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 }
@@ -517,6 +582,46 @@ public class MessagesFragment extends Fragment {
             requestLocation();
         }
 
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        HashMap<String, String> params_new = new HashMap<>();
+        params_new.put("keyword", username);
+
+        HttpRequest.sendOkHttpPostRequest("user/search", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        // 获取用户数据
+                        JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
+                        avatar = user.getString("avatarUrl");
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"好友列表获取失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        }, params_new);
+
 
         mMediaRecorderUtils = new MediaRecorderUtils.Builder(getActivity())
                 .setAudioSource(MediaRecorder.AudioSource.MIC)//麦克
@@ -556,7 +661,7 @@ public class MessagesFragment extends Fragment {
                     if (resStr.charAt(resStr.length()-1) != '}'){
                         resStr = resStr + "}";
                     }
-                    Log.e("response", resStr);
+                    Log.e("response", resStr+"chat/get");
                     try {
                         JSONObject jsonObject = new JSONObject(resStr);
                         if (jsonObject.getBoolean("success")) {
@@ -569,7 +674,7 @@ public class MessagesFragment extends Fragment {
                                     } else {
                                         k = 1;
                                     }
-                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, messages.getJSONObject(j).getString("content"), k));
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("fromUser").getString("avatarUrl"), messages.getJSONObject(j).getString("content"), k));
                                 }
                                 else if(messages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
                                     if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
@@ -577,7 +682,7 @@ public class MessagesFragment extends Fragment {
                                     } else {
                                         k = 3;
                                     }
-                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("fromUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content")));
                                 }
                                 else if(messages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
                                     if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
@@ -585,7 +690,7 @@ public class MessagesFragment extends Fragment {
                                     } else {
                                         k = 5;
                                     }
-                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("fromUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content")));
                                 }
                                 else if(messages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
                                     if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
@@ -593,7 +698,7 @@ public class MessagesFragment extends Fragment {
                                     } else {
                                         k = 7;
                                     }
-                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("fromUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content")));
                                 }
                                 else if(messages.getJSONObject(j).getString("messageType").equals("LOCATION")) {
                                     if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
@@ -601,7 +706,7 @@ public class MessagesFragment extends Fragment {
                                     } else {
                                         k = 9;
                                     }
-                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), messages.getJSONObject(j).getJSONObject("fromUser").getString("avatarUrl"), k, messages.getJSONObject(j).getString("content")));
                                 }
                             }
                             handler_chats.sendEmptyMessage(1);
@@ -645,7 +750,7 @@ public class MessagesFragment extends Fragment {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     String resStr = response.body().string();
-                    Log.e("response", resStr);
+                    Log.e("response", resStr+"group/get");
                     try {
                         JSONObject jsonObject = new JSONObject(resStr);
                         if (jsonObject.getBoolean("success")) {
@@ -670,7 +775,7 @@ public class MessagesFragment extends Fragment {
                                         } else {
                                             k = 0;
                                         }
-                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k));
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), groupMessages.getJSONObject(j).getString("content"), k));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
                                         if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
@@ -678,7 +783,7 @@ public class MessagesFragment extends Fragment {
                                         } else {
                                             k = 2;
                                         }
-                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
                                         if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
@@ -686,7 +791,7 @@ public class MessagesFragment extends Fragment {
                                         } else {
                                             k = 4;
                                         }
-                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
                                         if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
@@ -694,7 +799,7 @@ public class MessagesFragment extends Fragment {
                                         } else {
                                             k = 6;
                                         }
-                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("LOCATION")) {
                                         if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
@@ -702,7 +807,7 @@ public class MessagesFragment extends Fragment {
                                         } else {
                                             k = 8;
                                         }
-                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("avatarUrl"), k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                 }
                             }
@@ -763,8 +868,15 @@ public class MessagesFragment extends Fragment {
                         SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                         String username = sp.getString("username", "");
                         mainActivity.sendMsg(ws_msg_send.toString());
-                        data.add(new MessageA(username, R.drawable.contacts_6, v.getText().toString(), 1));
-                        messageAdapter.notifyDataSetChanged();
+                        data.add(new MessageA(username, avatar, v.getText().toString(), 1));
+                        if(messageAdapter == null)
+                        {
+                            messageAdapter = new MessageAdapter(data, getContext());
+                            listView.setAdapter(messageAdapter);
+                        }
+                        else {
+                            messageAdapter.notifyDataSetChanged();
+                        }
                     }
                     else if(chat_type == 1)
                     {
@@ -780,8 +892,15 @@ public class MessagesFragment extends Fragment {
                         SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                         String username = sp.getString("username", "");
                         mainActivity.sendMsg(ws_msg_send.toString());
-                        data.add(new MessageA(username, R.drawable.contacts_6, v.getText().toString(), 1));
-                        messageAdapter.notifyDataSetChanged();
+                        data.add(new MessageA(username, avatar, v.getText().toString(), 1));
+                        if(messageAdapter == null)
+                        {
+                            messageAdapter = new MessageAdapter(data, getContext());
+                            listView.setAdapter(messageAdapter);
+                        }
+                        else {
+                            messageAdapter.notifyDataSetChanged();
+                        }
                     }
                     edit_text.setText("");
                     return true;
@@ -908,6 +1027,18 @@ public class MessagesFragment extends Fragment {
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"图片错误", Toast.LENGTH_SHORT).show();
                     }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    String password = sp.getString("password", "");
+                    JSONObject ws_msg_login = new JSONObject();
+                    try {
+                        ws_msg_login.put("bizType", "USER_LOGIN");
+                        ws_msg_login.put("password", password);
+                        ws_msg_login.put("username", username);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mainActivity.sendMsg(ws_msg_login.toString());
                     handler_images.sendEmptyMessage(1);
                     Looper.loop();
                 } catch (JSONException e) {
@@ -944,6 +1075,18 @@ public class MessagesFragment extends Fragment {
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"音频错误", Toast.LENGTH_SHORT).show();
                     }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    String password = sp.getString("password", "");
+                    JSONObject ws_msg_login = new JSONObject();
+                    try {
+                        ws_msg_login.put("bizType", "USER_LOGIN");
+                        ws_msg_login.put("password", password);
+                        ws_msg_login.put("username", username);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mainActivity.sendMsg(ws_msg_login.toString());
                     handler_audio.sendEmptyMessage(1);
                     Looper.loop();
                 } catch (JSONException e) {
@@ -972,8 +1115,15 @@ public class MessagesFragment extends Fragment {
                     SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                     String username = sp.getString("username", "");
                     mainActivity.sendMsg(ws_msg_send.toString());
-                    data.add(new MessageA(username, R.drawable.contacts_6, 7, HttpRequest.media_url + filename));
-                    messageAdapter.notifyDataSetChanged();
+                    data.add(new MessageA(username, avatar, 7, HttpRequest.media_url + filename));
+                    if(messageAdapter == null)
+                    {
+                        messageAdapter = new MessageAdapter(data, getContext());
+                        listView.setAdapter(messageAdapter);
+                    }
+                    else {
+                        messageAdapter.notifyDataSetChanged();
+                    }
                 }
                 else if(chat_type == 1) {
                     JSONObject ws_msg_send = new JSONObject();
@@ -988,8 +1138,15 @@ public class MessagesFragment extends Fragment {
                     SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                     String username = sp.getString("username", "");
                     mainActivity.sendMsg(ws_msg_send.toString());
-                    data.add(new MessageA(username, R.drawable.contacts_6, 7, HttpRequest.media_url + filename));
-                    messageAdapter.notifyDataSetChanged();
+                    data.add(new MessageA(username,avatar, 7, HttpRequest.media_url + filename));
+                    if(messageAdapter == null)
+                    {
+                        messageAdapter = new MessageAdapter(data, getContext());
+                        listView.setAdapter(messageAdapter);
+                    }
+                    else {
+                        messageAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         };
@@ -1018,6 +1175,18 @@ public class MessagesFragment extends Fragment {
                         Looper.prepare();
                         Toast.makeText(getActivity().getApplicationContext(),"音频错误", Toast.LENGTH_SHORT).show();
                     }
+                    SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                    String username = sp.getString("username", "");
+                    String password = sp.getString("password", "");
+                    JSONObject ws_msg_login = new JSONObject();
+                    try {
+                        ws_msg_login.put("bizType", "USER_LOGIN");
+                        ws_msg_login.put("password", password);
+                        ws_msg_login.put("username", username);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mainActivity.sendMsg(ws_msg_login.toString());
                     handler_video.sendEmptyMessage(1);
                     Looper.loop();
                 } catch (JSONException e) {
@@ -1046,8 +1215,15 @@ public class MessagesFragment extends Fragment {
                     SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                     String username = sp.getString("username", "");
                     mainActivity.sendMsg(ws_msg_send.toString());
-                    data.add(new MessageA(username, R.drawable.contacts_6, 5, HttpRequest.media_url + filename));
-                    messageAdapter.notifyDataSetChanged();
+                    data.add(new MessageA(username, avatar, 5, HttpRequest.media_url + filename));
+                    if(messageAdapter == null)
+                    {
+                        messageAdapter = new MessageAdapter(data, getContext());
+                        listView.setAdapter(messageAdapter);
+                    }
+                    else {
+                        messageAdapter.notifyDataSetChanged();
+                    }
                 }
                 else if(chat_type == 1)
                 {
@@ -1063,8 +1239,15 @@ public class MessagesFragment extends Fragment {
                     SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                     String username = sp.getString("username", "");
                     mainActivity.sendMsg(ws_msg_send.toString());
-                    data.add(new MessageA(username, R.drawable.contacts_6, 5, HttpRequest.media_url + filename));
-                    messageAdapter.notifyDataSetChanged();
+                    data.add(new MessageA(username, avatar, 5, HttpRequest.media_url + filename));
+                    if(messageAdapter == null)
+                    {
+                        messageAdapter = new MessageAdapter(data, getContext());
+                        listView.setAdapter(messageAdapter);
+                    }
+                    else {
+                        messageAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         };
@@ -1111,8 +1294,15 @@ public class MessagesFragment extends Fragment {
             SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
             String username = sp.getString("username", "");
             mainActivity.sendMsg(ws_msg_send.toString());
-            data.add(new MessageA(username, R.drawable.contacts_6, 9, currentPosition.toString()));
-            messageAdapter.notifyDataSetChanged();
+            data.add(new MessageA(username, avatar, 9, currentPosition.toString()));
+            if(messageAdapter == null)
+            {
+                messageAdapter = new MessageAdapter(data, getContext());
+                listView.setAdapter(messageAdapter);
+            }
+            else {
+                messageAdapter.notifyDataSetChanged();
+            }
         }
         else if(chat_type == 1)
         {
@@ -1128,8 +1318,15 @@ public class MessagesFragment extends Fragment {
             SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
             String username = sp.getString("username", "");
             mainActivity.sendMsg(ws_msg_send.toString());
-            data.add(new MessageA(username, R.drawable.contacts_1, 9, currentPosition.toString()));
-            messageAdapter.notifyDataSetChanged();
+            data.add(new MessageA(username, avatar, 9, currentPosition.toString()));
+            if(messageAdapter == null)
+            {
+                messageAdapter = new MessageAdapter(data, getContext());
+                listView.setAdapter(messageAdapter);
+            }
+            else {
+                messageAdapter.notifyDataSetChanged();
+            }
         }
         Log.d("location", currentPosition.toString());
     }
@@ -1184,8 +1381,15 @@ public class MessagesFragment extends Fragment {
                             SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                             String username = sp.getString("username", "");
                             mainActivity.sendMsg(ws_msg_send.toString());
-                            data.add(new MessageA(username, R.drawable.contacts_6, 3, HttpRequest.media_url + filename));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(username, avatar, 3, HttpRequest.media_url + filename));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                         else if(chat_type == 1) {
                             JSONObject ws_msg_send = new JSONObject();
@@ -1200,8 +1404,15 @@ public class MessagesFragment extends Fragment {
                             SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                             String username = sp.getString("username", "");
                             mainActivity.sendMsg(ws_msg_send.toString());
-                            data.add(new MessageA(username, R.drawable.contacts_6, 3, HttpRequest.media_url + filename));
-                            messageAdapter.notifyDataSetChanged();
+                            data.add(new MessageA(username, avatar, 3, HttpRequest.media_url + filename));
+                            if(messageAdapter == null)
+                            {
+                                messageAdapter = new MessageAdapter(data, getContext());
+                                listView.setAdapter(messageAdapter);
+                            }
+                            else {
+                                messageAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 };

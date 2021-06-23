@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.dyf.andriod_frontend.BaiduLocationActivity;
 import com.dyf.andriod_frontend.R;
+import com.dyf.andriod_frontend.utils.HttpRequest;
 //import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 
 import java.io.IOException;
@@ -62,7 +63,10 @@ public class MessageAdapter extends BaseAdapter {
         if(messageA.getComponentType() == 0) {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_item_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             TextView content = (TextView) convertView.findViewById(R.id.message_content);
             content.setText(messageA.getContent());
             return convertView;
@@ -71,7 +75,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_item_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             TextView content = (TextView) convertView.findViewById(R.id.message_content);
             content.setText(messageA.getContent());
             return convertView;
@@ -80,7 +87,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_image_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
             Glide
                     .with(context)
@@ -92,7 +102,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_image_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
             Glide
                     .with(context)
@@ -104,7 +117,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_video_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
             videoView.setUp(messageA.getContentImage(), "视频", Jzvd.SCREEN_NORMAL);
             Glide.with(context)
@@ -116,7 +132,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_video_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
             videoView.setUp(messageA.getContentImage(), "视频", Jzvd.SCREEN_NORMAL);
             Glide.with(context)
@@ -128,7 +147,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             Button voice = (Button) convertView.findViewById(R.id.voice_content);
             voice.setOnClickListener(new View.OnClickListener(){
                 @Override
@@ -155,7 +177,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_voice_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             Button voice = (Button) convertView.findViewById(R.id.voice_content);
             voice.setOnClickListener(new View.OnClickListener(){
                 @Override
@@ -184,7 +209,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_location_left, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             TextView text = (TextView) convertView.findViewById(R.id.location_content);
             text.setText(messageA.getContentImage());
             Button location = (Button) convertView.findViewById(R.id.location_button);
@@ -201,7 +229,10 @@ public class MessageAdapter extends BaseAdapter {
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_location_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
-            icon.setImageResource(messageA.getAvatarIcon());
+            Glide
+                    .with(context)
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
+                    .into(icon);
             TextView text = (TextView) convertView.findViewById(R.id.location_content);
             text.setText(messageA.getContentImage());
             Button location = (Button) convertView.findViewById(R.id.location_button);
