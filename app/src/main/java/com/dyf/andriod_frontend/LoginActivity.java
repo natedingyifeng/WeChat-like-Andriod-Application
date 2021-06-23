@@ -61,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
 //        MultiDex.install(this);
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.commit();
+//        editor.clear();
+//        editor.commit();
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
         Button title_back = findViewById(R.id.title_back);
@@ -78,7 +78,9 @@ public class LoginActivity extends AppCompatActivity {
 
         Glide.with(this).load("http://8.140.133.34:7423/media/image.jpg").into(imageView);
 
-
+        SharedPreferences sp = getSharedPreferences(getString(R.string.store), MODE_PRIVATE);
+        username = sp.getString("username", "");
+        usernameEditText.setText(username);
 
         // 注册监听器
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +116,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
@@ -123,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("username", username);
                         editor.putString("password", password);
-                        editor.apply();
+                        editor.commit();
 
                         getSelfInfo();
 
@@ -183,6 +188,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);

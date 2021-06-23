@@ -32,6 +32,12 @@ public class SettingsFragment extends Fragment {
     private String slogan;
     private String phoneNumber;
 
+    ImageView avatarView;
+    TextView nicknameView;
+    TextView usernameView ;
+    TextView sloganView;
+    TextView phoneNumberView ;
+
     public SettingsFragment() {
         // Required empty public constructor
     }
@@ -51,26 +57,14 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ImageView avatarView = view.findViewById(R.id.settings_avatar_image_view);
-        TextView nicknameView = view.findViewById(R.id.settings_nickname_text_view);
-        TextView usernameView = view.findViewById(R.id.settings_username_text_view);
-        TextView sloganView = view.findViewById(R.id.settings_slogan_text_view);
-        TextView phoneNumberView = view.findViewById(R.id.settings_phone_number_text_view);
+        avatarView = view.findViewById(R.id.settings_avatar_image_view);
+        nicknameView = view.findViewById(R.id.settings_nickname_text_view);
+        usernameView = view.findViewById(R.id.settings_username_text_view);
+        sloganView = view.findViewById(R.id.settings_slogan_text_view);
+        phoneNumberView = view.findViewById(R.id.settings_phone_number_text_view);
 
 
-        SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
 
-        username = sp.getString("username", "获取失败");
-        nickname = sp.getString("nickname", "获取失败");
-        avatarUrl = HttpRequest.media_url+ sp.getString("avatarUrl", "R.string.test_user_avatar_url");
-        slogan = sp.getString("slogan", "这个人很懒，什么都没有留下。");
-        phoneNumber = sp.getString("phoneNumber", "");
-
-        nicknameView.setText(nickname);
-        usernameView.setText(username);
-        Glide.with(this).load(avatarUrl).into(avatarView);
-        phoneNumberView.setText(phoneNumber);
-        sloganView.setText(slogan);
 
         Button image_icon = getActivity().findViewById(R.id.settings_modify_btn);
         image_icon.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +83,24 @@ public class SettingsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+
+        username = sp.getString("username", "获取失败");
+        nickname = sp.getString("nickname", "获取失败");
+        avatarUrl = HttpRequest.media_url+ sp.getString("avatarUrl", "R.string.test_user_avatar_url");
+        slogan = sp.getString("slogan", "这个人很懒，什么都没有留下。");
+        phoneNumber = sp.getString("phoneNumber", "");
+
+        nicknameView.setText(nickname);
+        usernameView.setText(username);
+        Glide.with(this).load(avatarUrl).into(avatarView);
+        phoneNumberView.setText(phoneNumber);
+        sloganView.setText(slogan);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.dyf.andriod_frontend.utils;
 
 
+import android.util.Log;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,12 +86,13 @@ public class HttpRequest {
             builder.add(key, params.get(key));
         }
         RequestBody requestBody=builder.build();
-
         request = new Request.Builder().url(server_url + url).post(requestBody).build();
+        Log.e("HttpRequest", request.body().toString());
         okHttpClient.newCall(request).enqueue(callback);
     }
 
     public static Response sendOkHttpPostRequest(String url, Map<String, String> params) throws IOException {
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build();
         FormBody.Builder builder = new FormBody.Builder();
         for(String key:params.keySet())
@@ -97,7 +100,6 @@ public class HttpRequest {
             builder.add(key, params.get(key));
         }
         RequestBody requestBody=builder.build();
-
         request = new Request.Builder().url(server_url + url).post(requestBody).build();
         Response response =  okHttpClient.newCall(request).execute();
         return response;
@@ -131,10 +133,13 @@ public class HttpRequest {
                 jsonString.append("\"");
                 jsonString.append(",");
             }
-            jsonString.deleteCharAt(jsonString.length()-1);
+            if(jsonString.charAt(jsonString.length() - 1) == ',')
+                jsonString.deleteCharAt(jsonString.length()-1);
             jsonString.append("]");
             json.put(key, jsonString.toString());
         }
+
+        Log.e("HttpRequest", json.toString());
 
         RequestBody requestBody = RequestBody.create(json.toString(), JSON_Head);
 

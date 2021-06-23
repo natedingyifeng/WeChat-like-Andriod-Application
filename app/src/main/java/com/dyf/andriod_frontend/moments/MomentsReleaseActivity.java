@@ -297,6 +297,9 @@ public class MomentsReleaseActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
@@ -333,6 +336,9 @@ public class MomentsReleaseActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);

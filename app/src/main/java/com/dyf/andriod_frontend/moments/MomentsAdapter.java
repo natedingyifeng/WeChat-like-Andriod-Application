@@ -73,6 +73,9 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
             case -1:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_video,parent,false);
                 break;
+            case 0:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_0_image,parent,false);
+                break;
             case 1:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_1_image,parent,false);
                 break;
@@ -84,6 +87,21 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 break;
             case 4:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_4_image,parent,false);
+                break;
+            case 5:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_5_image,parent,false);
+                break;
+            case 6:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_6_image,parent,false);
+                break;
+            case 7:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_7_image,parent,false);
+                break;
+            case 8:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_8_image,parent,false);
+                break;
+            case 9:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_9_image,parent,false);
                 break;
             default:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments,parent,false);
@@ -421,6 +439,16 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 case -1:
                     videoView = (JzvdStd) itemView.findViewById(R.id.moments_video_view);
                     break;
+                case 9:
+                    imageViews[8] = itemView.findViewById(R.id.moments_image_9_view);
+                case 8:
+                    imageViews[7] = itemView.findViewById(R.id.moments_image_8_view);
+                case 7:
+                    imageViews[6] = itemView.findViewById(R.id.moments_image_7_view);
+                case 6:
+                    imageViews[5] = itemView.findViewById(R.id.moments_image_6_view);
+                case 5:
+                    imageViews[4] = itemView.findViewById(R.id.moments_image_5_view);
                 case 4:
                     imageViews[3] = itemView.findViewById(R.id.moments_image_4_view);
                 case 3:
