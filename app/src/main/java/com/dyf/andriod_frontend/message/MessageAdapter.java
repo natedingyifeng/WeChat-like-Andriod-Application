@@ -3,6 +3,7 @@ package com.dyf.andriod_frontend.message;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.dyf.andriod_frontend.BaiduLocationActivity;
 import com.dyf.andriod_frontend.R;
 //import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 
@@ -178,18 +180,36 @@ public class MessageAdapter extends BaseAdapter {
             });
             return convertView;
         }
+        else if(messageA.getComponentType() == 8)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_location_left, parent, false);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
+            icon.setImageResource(messageA.getAvatarIcon());
+            TextView text = (TextView) convertView.findViewById(R.id.location_content);
+            text.setText(messageA.getContentImage());
+            Button location = (Button) convertView.findViewById(R.id.location_button);
+            location.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, BaiduLocationActivity.class);
+                    context.startActivity(intent);
+                }
+            });
+            return convertView;
+        }
         else if(messageA.getComponentType() == 9)
         {
             convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_location_right, parent, false);
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             icon.setImageResource(messageA.getAvatarIcon());
             TextView text = (TextView) convertView.findViewById(R.id.location_content);
-            text.setText(messageA.getContent());
+            text.setText(messageA.getContentImage());
             Button location = (Button) convertView.findViewById(R.id.location_button);
             location.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
-
+                    Intent intent = new Intent(context, BaiduLocationActivity.class);
+                    context.startActivity(intent);
                 }
             });
             return convertView;

@@ -167,6 +167,13 @@ public class MessagesFragment extends Fragment {
                             messageAdapter.notifyDataSetChanged();
                         }
                     }
+                    else if (json_contact.getJSONObject(0).getString("messageType").equals("LOCATION")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 4);
+                        if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 8, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
                 }
                 else if(chat_type == 1)
                 {
@@ -201,6 +208,14 @@ public class MessagesFragment extends Fragment {
                         if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
                         {
                             data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 6, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if(json_contact.getJSONObject(0).getString("messageType").equals("LOCATION")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 4);
+                        if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
+                        {
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 8, json_contact.getJSONObject(0).getString("content")));
                             messageAdapter.notifyDataSetChanged();
                         }
                     }
@@ -580,6 +595,14 @@ public class MessagesFragment extends Fragment {
                                     }
                                     data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
                                 }
+                                else if(messages.getJSONObject(j).getString("messageType").equals("LOCATION")) {
+                                    if (messages.getJSONObject(j).getJSONObject("fromUser").getString("username").equals(talkToName)) {
+                                        k = 8;
+                                    } else {
+                                        k = 9;
+                                    }
+                                    data.add(new MessageA(messages.getJSONObject(j).getJSONObject("fromUser").getString("username"), R.drawable.contacts_6, k, messages.getJSONObject(j).getString("content")));
+                                }
                             }
                             handler_chats.sendEmptyMessage(1);
                         } else {
@@ -650,26 +673,34 @@ public class MessagesFragment extends Fragment {
                                         data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, groupMessages.getJSONObject(j).getString("content"), k));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("PHOTO")) {
-                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
-                                            k = 2;
-                                        } else {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
                                             k = 3;
+                                        } else {
+                                            k = 2;
                                         }
                                         data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("VIDEO")) {
-                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
-                                            k = 4;
-                                        } else {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
                                             k = 5;
+                                        } else {
+                                            k = 4;
                                         }
                                         data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
                                     }
                                     else if(groupMessages.getJSONObject(j).getString("messageType").equals("AUDIO")) {
-                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(talkToName)) {
-                                            k = 6;
-                                        } else {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
                                             k = 7;
+                                        } else {
+                                            k = 6;
+                                        }
+                                        data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
+                                    }
+                                    else if(groupMessages.getJSONObject(j).getString("messageType").equals("LOCATION")) {
+                                        if (groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username").equals(username)) {
+                                            k = 9;
+                                        } else {
+                                            k = 8;
                                         }
                                         data.add(new MessageA(groupMessages.getJSONObject(j).getJSONObject("sendUser").getString("username"), R.drawable.contacts_6, k, groupMessages.getJSONObject(j).getString("content")));
                                     }
@@ -787,7 +818,11 @@ public class MessagesFragment extends Fragment {
         location_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLocationInfo();
+                try {
+                    getLocationInfo();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
         Button titleBack = (Button) getActivity().findViewById(R.id.title_back);
@@ -1048,7 +1083,7 @@ public class MessagesFragment extends Fragment {
         }
     }
 
-    public void getLocationInfo() {
+    public void getLocationInfo() throws JSONException {
 //        JSONObject ws_msg_send = new JSONObject();
 //        try {
 //            ws_msg_send.put("bizType", "SEND_TEXT");
@@ -1058,11 +1093,45 @@ public class MessagesFragment extends Fragment {
 //        } catch (JSONException e) {
 //            e.printStackTrace();
 //        }
-        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-        String username = sp.getString("username", "");
-//        mainActivity.sendMsg(ws_msg_send.toString());
-        data.add(new MessageA(username, R.drawable.contacts_1, 9, positionText));
-        messageAdapter.notifyDataSetChanged();
+        JSONObject json_contact = new JSONObject(positionText);
+        StringBuilder currentPosition = new StringBuilder();
+        currentPosition.append("纬度：").append(json_contact.getString("latitude")).append("\n");
+        currentPosition.append("经线：").append(json_contact.getString("longitude")).append("\n");
+        currentPosition.append("地点：").append(json_contact.getString("place")).append("\n");
+        if(chat_type == 0) {
+            JSONObject ws_msg_send = new JSONObject();
+            try {
+                ws_msg_send.put("bizType", "SEND_TEXT");
+                ws_msg_send.put("content", currentPosition.toString());
+                ws_msg_send.put("targetUserId", talkToId);
+                ws_msg_send.put("messageType", "LOCATION");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+            String username = sp.getString("username", "");
+            mainActivity.sendMsg(ws_msg_send.toString());
+            data.add(new MessageA(username, R.drawable.contacts_6, 9, currentPosition.toString()));
+            messageAdapter.notifyDataSetChanged();
+        }
+        else if(chat_type == 1)
+        {
+            JSONObject ws_msg_send = new JSONObject();
+            try {
+                ws_msg_send.put("bizType", "GROUP_SEND_TEXT");
+                ws_msg_send.put("content", currentPosition.toString());
+                ws_msg_send.put("groupId", talkToId);
+                ws_msg_send.put("messageType", "LOCATION");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+            String username = sp.getString("username", "");
+            mainActivity.sendMsg(ws_msg_send.toString());
+            data.add(new MessageA(username, R.drawable.contacts_1, 9, currentPosition.toString()));
+            messageAdapter.notifyDataSetChanged();
+        }
+        Log.d("location", currentPosition.toString());
     }
 
     @Override

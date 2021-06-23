@@ -37,6 +37,7 @@
         <activity android:name=".Setting.SettingsPasswordModifyActivity" />
         <activity android:name=".ChatHistoryActivity" />
         <activity android:name=".GroupChatHistoryActivity" />
+        <activity android:name=".BaiduLocationActivity" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"

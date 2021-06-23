@@ -10,9 +10,9 @@
     android:layout_marginRight="80dp"
     android:gravity="left"
     android:orientation="horizontal"
-    android:paddingRight="10dp"
-    android:paddingTop="5dp"
     android:paddingLeft="5dp"
+    android:paddingTop="5dp"
+    android:paddingRight="10dp"
     android:paddingBottom="5dp">
 
     <!--    <VideoView-->
@@ -31,17 +31,27 @@
         android:src="@drawable/avatar1" />
 
     <Button
-        android:id="@+id/voice_content"
-        android:layout_width="50dp"
+        android:id="@+id/location_button"
+        android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="end|center_vertical"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/location"
+        android:gravity="center_vertical" />
+
+    <TextView
+        android:id="@+id/location_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="5dp"
         android:layout_marginLeft="5dp"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="0dp"
-        android:background="@drawable/voice_content"
-        android:gravity="center_vertical" />
+        android:text="TextView"
+        android:textColor="#000000"
+        android:textSize="12sp" />
 
 
 </LinearLayout>

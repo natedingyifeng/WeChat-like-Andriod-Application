@@ -109,6 +109,18 @@ public class ChatsFragment extends ListFragment {
             @SuppressLint("HandlerLeak")
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
+                SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+                String username = sp.getString("username", "");
+                String password = sp.getString("password", "");
+                JSONObject ws_msg_login = new JSONObject();
+                try {
+                    ws_msg_login.put("bizType", "USER_LOGIN");
+                    ws_msg_login.put("password", password);
+                    ws_msg_login.put("username", username);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mainActivity.sendMsg(ws_msg_login.toString());
                 getGroupChats();
             }
         };
@@ -172,6 +184,7 @@ public class ChatsFragment extends ListFragment {
 //                    Looper.prepare();
 //                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
 //                    Looper.loop();
+                    handler.sendEmptyMessage(1);
                 }
             }
         }, params);
@@ -197,18 +210,6 @@ public class ChatsFragment extends ListFragment {
 //        data.add(new Chat(getString(R.string.nickname5), R.drawable.contacts_5, "没事", "2021/01/05", 1));
         chatAdapter = new ChatAdapter(data,context);
         setListAdapter(chatAdapter);
-        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-        String username = sp.getString("username", "");
-        String password = sp.getString("password", "");
-        JSONObject ws_msg_login = new JSONObject();
-        try {
-            ws_msg_login.put("bizType", "USER_LOGIN");
-            ws_msg_login.put("password", password);
-            ws_msg_login.put("username", username);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mainActivity.sendMsg(ws_msg_login.toString());
     }
 
     public void getGroupChats() {
