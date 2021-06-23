@@ -34,6 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.ListFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.dyf.andriod_frontend.chat.Chat;
 import com.dyf.andriod_frontend.chat.ChatAdapter;
@@ -82,6 +83,7 @@ public class ChatsFragment extends ListFragment {
     private Handler handler_ws;
     public MainActivity mainActivity;
     private Context context;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
@@ -89,6 +91,13 @@ public class ChatsFragment extends ListFragment {
     public ChatsFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initial();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +113,28 @@ public class ChatsFragment extends ListFragment {
         bottomNavigationView = activity.findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setVisibility(View.VISIBLE);
         context = getActivity();
+        swipeRefreshLayout = (SwipeRefreshLayout) mainActivity.findViewById(R.id.chats_refresh_layout);
+//        handleDownPullUpdate();
+//        swipeRefreshLayout.setRefreshing(true);
+
+
+//        handleDownPullUpdate();
+//        swipeRefreshLayosut.setRefreshing(true);
+
+//        Button titleBack_2 = (Button) getActivity().findViewById(R.id.title_back2);
+//        titleBack_2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//                CreateGroupMemberFragment creategroupFragment = new CreateGroupMemberFragment();
+//                transaction.replace(R.id.flFragment, creategroupFragment);
+//                transaction.addToBackStack(null);
+//                transaction.commit();
+//            }
+//        });
+    }
+
+    public void initial() {
         SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
         String username = sp.getString("username", "");
         handler = new Handler(){
@@ -165,6 +196,7 @@ public class ChatsFragment extends ListFragment {
                             contacts_name.add(friends.getJSONObject(i).getString("username"));
                             contacts_avatar.add(friends.getJSONObject(i).getString("avatarUrl"));
                         }
+//                        swipeRefreshLayout.setRefreshing(false);
                         handler.sendEmptyMessage(1);
                     }else{
                         handler.sendEmptyMessage(1);
@@ -181,18 +213,6 @@ public class ChatsFragment extends ListFragment {
                 }
             }
         }, params);
-
-//        Button titleBack_2 = (Button) getActivity().findViewById(R.id.title_back2);
-//        titleBack_2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//                CreateGroupMemberFragment creategroupFragment = new CreateGroupMemberFragment();
-//                transaction.replace(R.id.flFragment, creategroupFragment);
-//                transaction.addToBackStack(null);
-//                transaction.commit();
-//            }
-//        });
     }
 
     public void showChatMessages() {
@@ -384,6 +404,17 @@ public class ChatsFragment extends ListFragment {
             isurl = true;
         }
         return isurl;
+    }
+
+    // 实现下拉刷新
+    private void handleDownPullUpdate(){
+        swipeRefreshLayout.setEnabled(true);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                initial();
+            }
+        });
     }
 
 }
