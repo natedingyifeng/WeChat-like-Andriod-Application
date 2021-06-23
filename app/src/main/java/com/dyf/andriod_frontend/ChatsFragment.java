@@ -109,18 +109,7 @@ public class ChatsFragment extends ListFragment {
             @SuppressLint("HandlerLeak")
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
-                SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
-                String username = sp.getString("username", "");
-                String password = sp.getString("password", "");
-                JSONObject ws_msg_login = new JSONObject();
-                try {
-                    ws_msg_login.put("bizType", "USER_LOGIN");
-                    ws_msg_login.put("password", password);
-                    ws_msg_login.put("username", username);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mainActivity.sendMsg(ws_msg_login.toString());
+
                 getGroupChats();
             }
         };

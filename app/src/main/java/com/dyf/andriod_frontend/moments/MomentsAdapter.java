@@ -74,6 +74,7 @@ public class MomentsAdapter extends RecyclerView.Adapter<MomentsAdapter.MomentsV
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_video,parent,false);
                 break;
             case 0:
+            case -2:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_moments_0_image,parent,false);
                 break;
             case 1:
