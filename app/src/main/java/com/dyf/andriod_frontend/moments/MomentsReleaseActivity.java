@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,7 +18,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -60,6 +63,7 @@ public class MomentsReleaseActivity extends AppCompatActivity {
     private List<String> filePaths = new ArrayList<>();
     private String imagePath[] = new String[9];
     private Button releaseBtn;
+    private Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +97,16 @@ public class MomentsReleaseActivity extends AppCompatActivity {
 
         releaseBtn = findViewById(R.id.moments_release_upload_btn);
 
+
+        handler = new Handler(){
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                if (msg.what == 0){
+                    MomentsReleaseActivity.this.finish();
+                }
+            }
+        };
 
         imageView[0].setImageResource(R.drawable.add2);
 
@@ -240,7 +254,8 @@ public class MomentsReleaseActivity extends AppCompatActivity {
                         TableRow row3 = findViewById(R.id.moments_release_row3);
                         row3.setMinimumHeight(300);
                     }
-                    imageView[imageCount].setImageResource(R.drawable.add2);
+                    if(imageCount != 9)
+                        imageView[imageCount].setImageResource(R.drawable.add2);
 
                     try {
                         uploadFile(imageCount - 1);
@@ -304,10 +319,10 @@ public class MomentsReleaseActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if (jsonObject.getBoolean("success")){
+                        handler.sendEmptyMessage(0);
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(), "发布成功", Toast.LENGTH_SHORT).show();
                         Looper.loop();
-                        MomentsReleaseActivity.this.finish();
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"发布错误", Toast.LENGTH_SHORT).show();

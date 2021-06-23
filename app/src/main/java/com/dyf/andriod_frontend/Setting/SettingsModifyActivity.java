@@ -1,6 +1,7 @@
 package com.dyf.andriod_frontend.Setting;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +10,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -68,6 +71,8 @@ public class SettingsModifyActivity extends AppCompatActivity {
     private String phone_previous;
     private String slogan_previous;
 
+    private Handler handler;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +99,15 @@ public class SettingsModifyActivity extends AppCompatActivity {
             }
         });
 
-
+        handler = new Handler(){
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                if (msg.what == 0){
+                    SettingsModifyActivity.this.finish();
+                }
+            }
+        };
 
         SharedPreferences sp = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
 
@@ -178,7 +191,7 @@ public class SettingsModifyActivity extends AppCompatActivity {
                         editor.putString("avatarUrl",avatarUrl);
                         editor.apply();
 
-
+                        handler.sendEmptyMessage(0);
 
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"修改成功", Toast.LENGTH_SHORT).show();
@@ -187,7 +200,6 @@ public class SettingsModifyActivity extends AppCompatActivity {
 //                        Intent intent = new Intent(getApplicationContext(), SettingsFragment.class);
 //                        startActivity(intent);
 
-                        SettingsModifyActivity.this.finish();
 
                     }else{
                         Looper.prepare();

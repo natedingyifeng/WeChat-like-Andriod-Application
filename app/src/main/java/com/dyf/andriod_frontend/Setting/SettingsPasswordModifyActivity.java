@@ -2,10 +2,13 @@ package com.dyf.andriod_frontend.Setting;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +38,8 @@ public class SettingsPasswordModifyActivity extends AppCompatActivity {
     private EditText passwordNewEdit;
     private Button btn;
 
+    private Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,16 @@ public class SettingsPasswordModifyActivity extends AppCompatActivity {
                 SettingsPasswordModifyActivity.this.finish();
             }
         });
+
+        handler = new Handler(){
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                if (msg.what == 0){
+                   SettingsPasswordModifyActivity.this.finish();
+                }
+            }
+        };
 
         //设置监听器
         btn.setOnClickListener(new View.OnClickListener() {
@@ -98,10 +113,10 @@ public class SettingsPasswordModifyActivity extends AppCompatActivity {
                                 editor.putString("password", passwordNew);
                                 editor.apply();
 
+                                handler.sendEmptyMessage(0);
                                 Looper.prepare();
                                 Toast.makeText(getApplicationContext(),"修改成功", Toast.LENGTH_SHORT).show();
                                 Looper.loop();
-                                SettingsPasswordModifyActivity.this.finish();
 //                        Intent intent = new Intent(getApplicationContext(), SettingsFragment.class);
 //                        startActivity(intent);
 
