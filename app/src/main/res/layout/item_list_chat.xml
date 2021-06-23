@@ -65,6 +65,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="0dp"
             android:focusable="false"
+            android:maxLines="1"
             android:gravity="center_vertical"
             android:text="@string/sentence1"
             android:textSize="15sp" />

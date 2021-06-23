@@ -76,7 +76,10 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.password_edit_text);
         imageView = findViewById(R.id.imageView);
 
-        Glide.with(this).load("http://8.140.133.34:7423/media/image.jpg").into(imageView);
+        Glide.with(this).
+                load("http://8.140.133.34:7423/media/2021-06-23%2020%3A55%3A21.837_65138347_p0.png")
+                .thumbnail(1.0f)
+                .into(imageView);
 
         SharedPreferences sp = getSharedPreferences(getString(R.string.store), MODE_PRIVATE);
         username = sp.getString("username", "");
