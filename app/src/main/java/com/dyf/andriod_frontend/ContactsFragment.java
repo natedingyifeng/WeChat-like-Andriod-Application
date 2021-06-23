@@ -152,6 +152,77 @@ public class ContactsFragment extends ListFragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+//        Toast.makeText(mainActivity, "onResume调用", Toast.LENGTH_SHORT).show();
+
+        mainActivity = (MainActivity ) getActivity();
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+
+        Context context = getActivity();
+        contacts = new LinkedList<>();
+        contacts.add(new Contact("添加朋友", R.drawable.add_friends, 1, null));
+        contacts.add(new Contact("发起群聊", R.drawable.group_chat, 2, null));
+        contacts.add(new Contact("好友请求", R.drawable.new_friend, 3, null));
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("keyword", username);
+
+        HttpRequest.sendOkHttpPostRequest("user/search", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        // 获取用户数据
+                        JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
+                        try {
+                            JSONArray friends = user.getJSONArray("contacts");
+                            Log.d("len", friends.getJSONObject(0).getString("username") + "(" + friends.getJSONObject(0).getString("nickname") + ")");
+                            for (int i = 0; i < friends.length(); i++) {
+                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                            }
+                        } catch (JSONException e) {}
+                        handler.sendEmptyMessage(1);
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"好友列表获取失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        handler.sendEmptyMessage(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Looper.prepare();
+                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        }, params);
+
+        handler = new Handler(){
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                setListAdapter(new ContactAdapter(contacts, context));
+            }
+        };
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -211,6 +282,9 @@ public class ContactsFragment extends ListFragment {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);

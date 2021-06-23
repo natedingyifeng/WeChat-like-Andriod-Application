@@ -143,6 +143,9 @@ public class ChatsFragment extends ListFragment {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
@@ -150,7 +153,7 @@ public class ChatsFragment extends ListFragment {
                         // 获取用户数据
                         JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
                         JSONArray friends =user.getJSONArray("contacts");
-                        Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
+//                        Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
                         for (int i = 0; i < friends.length(); i++)
                         {
                             contacts_id.add(friends.getJSONObject(i).getString("id"));
@@ -207,6 +210,9 @@ public class ChatsFragment extends ListFragment {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
@@ -267,6 +273,9 @@ public class ChatsFragment extends ListFragment {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     String resStr = response.body().string();
+                    if (resStr.charAt(resStr.length()-1) != '}'){
+                        resStr = resStr + "}";
+                    }
                     Log.e("response", resStr);
                     try {
                         JSONObject jsonObject = new JSONObject(resStr);
