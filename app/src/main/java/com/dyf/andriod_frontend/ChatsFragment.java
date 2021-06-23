@@ -74,6 +74,7 @@ public class ChatsFragment extends ListFragment {
     private List<Chat> data;
     private ListView listView;
     private LinkedList<String> contacts_id;
+    private LinkedList<String> contacts_avatar;
     private LinkedList<String> contacts_name;
     private Handler handler;
     private Handler handler_chats;
@@ -127,6 +128,7 @@ public class ChatsFragment extends ListFragment {
             }
         };
         contacts_id = new LinkedList<>();
+        contacts_avatar = new LinkedList<>();
         contacts_name = new LinkedList<>();
         data = new ArrayList<Chat>();
 
@@ -161,6 +163,7 @@ public class ChatsFragment extends ListFragment {
                         {
                             contacts_id.add(friends.getJSONObject(i).getString("id"));
                             contacts_name.add(friends.getJSONObject(i).getString("username"));
+                            contacts_avatar.add(friends.getJSONObject(i).getString("avatarUrl"));
                         }
                         handler.sendEmptyMessage(1);
                     }else{
@@ -228,16 +231,16 @@ public class ChatsFragment extends ListFragment {
                                 Log.d("12", groupMessages.toString());
                                 if(isHttpUrl(groupMessages.getString("content")))
                                 {
-                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, "点击查看", "", 1, groups.getJSONObject(i).getString("id")));
+                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), groups.getJSONObject(i).getString("avatarUrl"), "点击查看", "", 1, groups.getJSONObject(i).getString("id")));
                                 }
                                 else
                                 {
-                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, groupMessages.getString("content"), "", 1, groups.getJSONObject(i).getString("id")));
+                                    data.add(new Chat(groups.getJSONObject(i).getString("name"), groups.getJSONObject(i).getString("avatarUrl"), groupMessages.getString("content"), "", 1, groups.getJSONObject(i).getString("id")));
                                 }
                             }
                             catch (JSONException e)
                             {
-                                data.add(new Chat(groups.getJSONObject(i).getString("name"), R.drawable.group_chat_avatar, "", "", 1, groups.getJSONObject(i).getString("id")));
+                                data.add(new Chat(groups.getJSONObject(i).getString("name"), groups.getJSONObject(i).getString("avatarUrl"), "", "", 1, groups.getJSONObject(i).getString("id")));
                             }
                         }
                         handler_group_chats.sendEmptyMessage(1);
@@ -264,6 +267,7 @@ public class ChatsFragment extends ListFragment {
             params.put("talkToUserId", contacts_id.get(i));
             String talkToId_tem = contacts_id.get(i);
             String talkToName_tem = contacts_name.get(i);
+            String talkToAvatar_tem = contacts_avatar.get(i);
             Log.e("request", contacts_id.get(i)+contacts_name.get(i));
 
             HttpRequest.sendOkHttpPostRequest("chat/get", new Callback() {
@@ -286,7 +290,7 @@ public class ChatsFragment extends ListFragment {
                         if (jsonObject.getBoolean("success")){
                             JSONArray messages = jsonObject.getJSONArray("messages");
                             if(messages.length()>0) {
-                                data.add(new Chat(talkToName_tem, R.drawable.contacts_1, messages.getJSONObject(messages.length() - 1).getString("content"), formatTime(messages.getJSONObject(messages.length() - 1).getString("createdAt")), talkToId_tem));
+                                data.add(new Chat(talkToName_tem, talkToAvatar_tem , messages.getJSONObject(messages.length() - 1).getString("content"), formatTime(messages.getJSONObject(messages.length() - 1).getString("createdAt")), talkToId_tem));
 //                            Log.d("messages", messages.toString());
                                 handler_chats.sendEmptyMessage(1);
                             }

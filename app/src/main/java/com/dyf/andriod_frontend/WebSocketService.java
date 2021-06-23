@@ -28,7 +28,7 @@ public class WebSocketService extends Service {
 
     public static MyWebSocketClient socketClient = null;
 
-    private static String SOCKET_URL = "ws://183.172.186.150:520/ws";
+    private static String SOCKET_URL = "ws://8.140.133.34:7422/ws";
     private MyWebSocketClientBinder mBinder = new MyWebSocketClientBinder();
     private final static int GRAY_SERVICE_ID = 1001;
     //灰色保活

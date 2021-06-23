@@ -97,7 +97,7 @@ public class MessageAdapter extends BaseAdapter {
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
             Glide
                     .with(context)
-                    .load(HttpRequest.media_url+messageA.getContentImage())
+                    .load(messageA.getContentImage())
                     .into(content);
             return convertView;
         }
@@ -113,7 +113,7 @@ public class MessageAdapter extends BaseAdapter {
             ImageView content = (ImageView) convertView.findViewById(R.id.message_content_image);
             Glide
                     .with(context)
-                    .load(HttpRequest.media_url+messageA.getContentImage())
+                    .load(messageA.getContentImage())
                     .into(content);
             return convertView;
         }
@@ -123,13 +123,13 @@ public class MessageAdapter extends BaseAdapter {
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             Glide
                     .with(context)
-                    .load(messageA.getAvatarIcon())
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
                     .into(icon);
 //            icon.setImageResource(messageA.getAvatarIcon());
             JzvdStd videoView = (JzvdStd) convertView.findViewById(R.id.player_list_video);
             videoView.setUp(messageA.getContentImage(), "视频", Jzvd.SCREEN_NORMAL);
             Glide.with(context)
-                    .load(HttpRequest.media_url+messageA.getContentImage())
+                    .load(messageA.getContentImage())
                     .into(videoView.posterImageView);
             return convertView;
         }
@@ -240,11 +240,11 @@ public class MessageAdapter extends BaseAdapter {
             ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
             Glide
                     .with(context)
-                    .load(messageA.getAvatarIcon())
+                    .load(HttpRequest.media_url+messageA.getAvatarIcon())
                     .into(icon);
 //            icon.setImageResource(messageA.getAvatarIcon());
             TextView text = (TextView) convertView.findViewById(R.id.location_content);
-            text.setText(HttpRequest.media_url+messageA.getContentImage());
+            text.setText(messageA.getContentImage());
             Button location = (Button) convertView.findViewById(R.id.location_button);
             location.setOnClickListener(new View.OnClickListener(){
                 @Override
