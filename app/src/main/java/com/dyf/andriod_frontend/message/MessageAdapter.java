@@ -31,7 +31,7 @@ public class MessageAdapter extends BaseAdapter {
 
     private LinkedList<MessageA> data;
     private Context context;
-    private MediaPlayer mp = new MediaPlayer();
+//    private MediaPlayer mp = new MediaPlayer();
 
     public MessageAdapter(LinkedList<MessageA> data, Context context) {
         this.data = data;
@@ -131,6 +131,7 @@ public class MessageAdapter extends BaseAdapter {
             voice.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
+                    MediaPlayer mp = new MediaPlayer();
                     if(mp.isPlaying() == false){
                         try {
                             mp.setDataSource(messageA.getContentImage());
@@ -157,9 +158,10 @@ public class MessageAdapter extends BaseAdapter {
             voice.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
+                    MediaPlayer mp = new MediaPlayer();
                     if(mp.isPlaying() == false){
                         try {
-                            mp.setDataSource(messageA.getContent());
+                            mp.setDataSource(messageA.getContentImage());
                             mp.prepare();
                             mp.start();
                         } catch (IOException e) {
@@ -172,6 +174,22 @@ public class MessageAdapter extends BaseAdapter {
                         mp.stop();
                         mp.reset();
                     }
+                }
+            });
+            return convertView;
+        }
+        else if(messageA.getComponentType() == 9)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.chat_message_location_right, parent, false);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.message_avatar_icon);
+            icon.setImageResource(messageA.getAvatarIcon());
+            TextView text = (TextView) convertView.findViewById(R.id.location_content);
+            text.setText(messageA.getContent());
+            Button location = (Button) convertView.findViewById(R.id.location_button);
+            location.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+
                 }
             });
             return convertView;
