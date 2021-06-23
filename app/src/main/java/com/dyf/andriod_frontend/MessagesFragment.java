@@ -111,7 +111,7 @@ public class MessagesFragment extends Fragment {
     private int chat_type;
     private MediaRecorderUtils mMediaRecorderUtils;
     public LocationClient mLocationClient;
-    private TextView positionText;
+    private String positionText;
     private MapView mapView;
     private BaiduMap baiduMap;
     private boolean isFirstLocate = true;
@@ -384,6 +384,7 @@ public class MessagesFragment extends Fragment {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
+            JSONObject positionJson = new JSONObject();
             StringBuilder currentPosition = new StringBuilder();
             currentPosition.append("纬度：").append(location.getLatitude()).append("\n");
             currentPosition.append("经线：").append(location.getLongitude()).append("\n");
@@ -393,17 +394,24 @@ public class MessagesFragment extends Fragment {
             currentPosition.append("区：").append(location.getDistrict()).append("\n");
             currentPosition.append("街道：").append(location.getStreet()).append("\n");
             currentPosition.append("定位方式：");
+            try {
+                positionJson.put("latitude", location.getLatitude());
+                positionJson.put("longitude", location.getLongitude());
+                positionJson.put("place", location.getCountry()+" "+location.getProvince()+" "+location.getCity()+" "+location.getDistrict());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (location.getLocType() == BDLocation.TypeGpsLocation) {
                 currentPosition.append("GPS");
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {
                 currentPosition.append("网络");
             }
-            positionText.setText(currentPosition);
-            Log.d("GPS", String.valueOf(currentPosition));
-            if (location.getLocType() == BDLocation.TypeGpsLocation
-                    || location.getLocType() == BDLocation.TypeNetWorkLocation) {
-                navigateTo(location);
-            }
+            positionText = positionJson.toString();
+//            Log.d("GPS", String.valueOf(currentPosition));
+//            if (location.getLocType() == BDLocation.TypeGpsLocation
+//                    || location.getLocType() == BDLocation.TypeNetWorkLocation) {
+//                navigateTo(location);
+//            }
         }
 
     }
@@ -467,32 +475,32 @@ public class MessagesFragment extends Fragment {
 //        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
         mainActivity = (MainActivity ) getActivity();
         doRegisterReceiver();
-//        mLocationClient = new LocationClient(getActivity().getApplicationContext());
-//        mLocationClient.registerLocationListener(new MyLocationListener());
-//        SDKInitializer.initialize(getActivity().getApplicationContext());
+        mLocationClient = new LocationClient(getActivity().getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLocationListener());
+        SDKInitializer.initialize(getActivity().getApplicationContext());
 ////        baiduMap = mapView.getMap();
 ////        baiduMap.setMyLocationEnabled(true);
 ////        checkVersion();
-//        List<String> permissionList = new ArrayList<>();
-//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.READ_PHONE_STATE);
 //        }
-////        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-////            permissionList.add(Manifest.permission.READ_PHONE_STATE);
-////        }
-//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//        }
-//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-//        }
-//        if (!permissionList.isEmpty()) {
-//            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
-//            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
-//        }
-//        else {
-//            requestLocation();
-//        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (!permissionList.isEmpty()) {
+            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
+        }
+        else {
+            requestLocation();
+        }
 
 
         mMediaRecorderUtils = new MediaRecorderUtils.Builder(getActivity())
@@ -1038,7 +1046,20 @@ public class MessagesFragment extends Fragment {
     }
 
     public void getLocationInfo() {
-        requestLocation();
+//        JSONObject ws_msg_send = new JSONObject();
+//        try {
+//            ws_msg_send.put("bizType", "SEND_TEXT");
+//            ws_msg_send.put("content", positionText);
+//            ws_msg_send.put("targetUserId", talkToId);
+//            ws_msg_send.put("messageType", "LOCATION");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+//        mainActivity.sendMsg(ws_msg_send.toString());
+        data.add(new MessageA(username, R.drawable.contacts_1, 9, positionText));
+        messageAdapter.notifyDataSetChanged();
     }
 
     @Override
