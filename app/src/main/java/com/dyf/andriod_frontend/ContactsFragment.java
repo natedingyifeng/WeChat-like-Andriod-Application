@@ -195,7 +195,7 @@ public class ContactsFragment extends ListFragment {
                             JSONArray friends = user.getJSONArray("contacts");
                             Log.d("len", friends.getJSONObject(0).getString("username") + "(" + friends.getJSONObject(0).getString("nickname") + ")");
                             for (int i = 0; i < friends.length(); i++) {
-                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), R.drawable.contacts_1, 0, friends.getJSONObject(i).getString("id")));
+                                contacts.add(new Contact(friends.getJSONObject(i).getString("username"), friends.getJSONObject(i).getString("avatarUrl"), friends.getJSONObject(i).getString("id")));
                             }
                         } catch (JSONException e) {}
                         handler.sendEmptyMessage(1);
@@ -240,6 +240,18 @@ public class ContactsFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity ) getActivity();
+        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        String password = sp.getString("password", "");
+        JSONObject ws_msg_login = new JSONObject();
+        try {
+            ws_msg_login.put("bizType", "USER_LOGIN");
+            ws_msg_login.put("password", password);
+            ws_msg_login.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mainActivity.sendMsg(ws_msg_login.toString());
 //        SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
 //        String username = sp.getString("username", "");
 //        String password = sp.getString("password", "");

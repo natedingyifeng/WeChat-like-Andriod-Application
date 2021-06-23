@@ -6,10 +6,11 @@ public class Contact {
     private int avatarIcon; // 头像
     public int check_type;
     private String id;
+    private String avatarUrl; // 头像
 
-    public Contact(String nickname, int avatarIcon, String id) {
+    public Contact(String nickname, String avatarUrl, String id) {
         this.nickname = nickname;
-        this.avatarIcon = avatarIcon;
+        this.avatarUrl = avatarUrl;
         this.check_type = 0;
         this.id = id;
     }
@@ -32,4 +33,6 @@ public class Contact {
     public int getType() { return check_type; }
 
     public String getId() {return id;}
+
+    public String getAvatarUrl() {return avatarUrl;}
 }

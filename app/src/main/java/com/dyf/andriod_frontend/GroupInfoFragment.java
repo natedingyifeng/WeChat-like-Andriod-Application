@@ -150,7 +150,7 @@ public class GroupInfoFragment extends Fragment {
                         JSONArray groupMembers = groups.getJSONObject(index).getJSONArray("members");
                         for(int j=0;j<groupMembers.length();j++)
                         {
-                            data_icons.add(new Icons(groupMembers.getJSONObject(j).getString("username"), R.drawable.group_chat_avatar));
+                            data_icons.add(new Icons(groupMembers.getJSONObject(j).getString("username"), groupMembers.getJSONObject(j).getString("avatarUrl")));
                         }
                         handler_group_chats.sendEmptyMessage(1);
                     } else {
