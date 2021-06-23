@@ -31,9 +31,12 @@ import okhttp3.ResponseBody;
 
 public class HttpRequest {
 //    private static final String urlStr = "http://8.140.133.34:7421/";
-    public static final String ip = "http://183.172.186.150";
-    public static final String server_url = ip + ":7000/";
-    public static final String media_url = ip + ":7001/media/";
+    private static final String ip = "http://8.140.133.34";
+//    public static final String ip = "http://183.172.186.150";
+//    public static final String server_url = ip + ":7000/";
+//    public static final String media_url = ip + ":7001/media/";
+    public static final String server_url = ip + ":7423/";
+    public static final String media_url = ip + ":7423/media/";
     private static final MediaType JSON_Head = MediaType.get("application/json; charset=utf-8");
     private static final OkHttpClient client = new OkHttpClient();
 

@@ -125,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
         params.put("username", username);
         params.put("password", password);
         params.put("nickname", nickname);
-        params.put("avatarUrl", avatarUrl);
+        params.put("avatar", avatarUrl);
 
         HttpRequest.sendOkHttpPostRequest("user/register", new Callback() {
             @Override
@@ -138,6 +138,9 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
 
                 try {
@@ -226,6 +229,9 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);

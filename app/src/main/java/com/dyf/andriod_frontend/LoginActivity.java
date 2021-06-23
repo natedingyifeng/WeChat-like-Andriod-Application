@@ -200,15 +200,19 @@ public class LoginActivity extends AppCompatActivity {
                         // 将用户数据存入本地
                         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.clear();
                         editor.putString("avatarUrl", user.getString("avatarUrl"));
                         editor.putString("nickname", user.getString("nickname"));
+                        editor.putString("username", username);
+                        editor.putString("password", password);
                         editor.putString("id", user.getString("id"));
                         if(user.has("slogan")){
                             editor.putString("slogan", user.getString("slogan"));
-                        }
+                        }else
+                            editor.putString("slogan", "");
                         if(user.has("phoneNumber")){
                             editor.putString("phoneNumber", user.getString("phoneNumber"));
-                        }
+                        }else editor.putString("phoneNumber", "");
                         editor.apply();
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"用户信息获取成功", Toast.LENGTH_SHORT).show();

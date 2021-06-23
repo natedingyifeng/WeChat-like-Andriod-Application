@@ -153,7 +153,9 @@ public class ChatsFragment extends ListFragment {
                     if (jsonObject.getBoolean("success")){
                         // 获取用户数据
                         JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
-                        JSONArray friends =user.getJSONArray("contacts");
+                        JSONArray friends = new JSONArray();
+                        if(user.has("contacts"))
+                            friends =user.getJSONArray("contacts");
 //                        Log.d("len", friends.getJSONObject(0).getString("username")+"("+friends.getJSONObject(0).getString("nickname")+")");
                         for (int i = 0; i < friends.length(); i++)
                         {
