@@ -2,6 +2,7 @@ package com.dyf.andriod_frontend;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -64,6 +65,12 @@ public class GroupInfoFragment extends Fragment {
     private String message_name;
     private String group_id;
     private Handler handler_group_chats;
+    private Handler handler_leave;
+    private Button button_add;
+    private Button button_leave;
+    private String user_id;
+    private int chattype;
+    private String taketoname;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
@@ -72,7 +79,9 @@ public class GroupInfoFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void saveMessageInfo(String id) {
+    public void saveMessageInfo(int checktype, String name, String id) {
+        this.chattype = checktype;
+        this.taketoname = name;
         this.group_id = id;
     }
 
@@ -157,11 +166,48 @@ public class GroupInfoFragment extends Fragment {
             }
         }, params);
 
+        SharedPreferences sp = getActivity().getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
+        String username = sp.getString("username", "");
+        HashMap<String, String> params_new = new HashMap<>();
+        params_new.put("keyword", username);
+
+        HttpRequest.sendOkHttpPostRequest("user/search", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Looper.prepare();
+                Toast.makeText(getActivity().getApplicationContext(),R.string.network_error, Toast.LENGTH_SHORT).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String resStr = response.body().string();
+                Log.e("response", resStr);
+                try {
+                    JSONObject jsonObject = new JSONObject(resStr);
+                    if (jsonObject.getBoolean("success")){
+                        // 获取用户数据
+                        JSONObject user = jsonObject.getJSONArray("users").getJSONObject(0);
+                        user_id = user.getString("id");
+                    }else{
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(),"好友列表获取失败", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+//                    Looper.prepare();
+//                    Toast.makeText(getActivity().getApplicationContext(),R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+//                    Looper.loop();
+                }
+            }
+        }, params_new);
+
         handler_group_chats = new Handler() {
             @SuppressLint("HandlerLeak")
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                data_icons.add(new Icons(R.drawable.contacts_more, 1));
+//                data_icons.add(new Icons(R.drawable.contacts_more, 1));
                 iconsAdapter = new IconsAdapter(data_icons, context);
                 recyclerView.setAdapter(iconsAdapter);
                 GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 5);
@@ -180,13 +226,61 @@ public class GroupInfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                title.setText(message_name);
+                title.setText(taketoname);
                 MessagesFragment messagesFragment = new MessagesFragment();
+                messagesFragment.setInfo(chattype, taketoname, group_id);
                 transaction.replace(R.id.flFragment, messagesFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
+        button_add = getActivity().findViewById(R.id.button_addmorefriend);
+        button_leave = getActivity().findViewById(R.id.button_leavegroup);
+        button_leave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("leaveUserId", user_id);
+                params.put("groupId", group_id);
+
+                HttpRequest.sendOkHttpPostRequest("group/leave", new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        Looper.prepare();
+                        Toast.makeText(getActivity().getApplicationContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        String resStr = response.body().string();
+                        Log.e("response", resStr);
+                        try {
+                            handler_leave.sendEmptyMessage(1);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Looper.prepare();
+                            Toast.makeText(getActivity().getApplicationContext(), R.string.json_parse_error, Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+                    }
+                }, params);
+            }
+        });
+
+        handler_leave = new Handler() {
+            @SuppressLint("HandlerLeak")
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                title.setText("消息");
+                ChatsFragment chatsFragment = new ChatsFragment();
+                transaction.replace(R.id.flFragment, chatsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        };
+
     }
 
 

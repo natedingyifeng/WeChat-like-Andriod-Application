@@ -163,6 +163,8 @@ public class MessageAdapter extends BaseAdapter {
                             mp.prepare();
                             mp.start();
                         } catch (IOException e) {
+                            mp.stop();
+                            mp.reset();
                             e.printStackTrace();
                         }
                     }

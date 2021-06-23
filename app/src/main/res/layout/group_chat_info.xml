@@ -49,7 +49,15 @@
         android:paddingBottom="2dp">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/button_addmorefriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="邀请联系人加入群聊"
+            android:textColor="#E91E63"
+            app:backgroundTint="#FFFFFF" />
+
+        <Button
+            android:id="@+id/button_leavegroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="删除并退出群聊"

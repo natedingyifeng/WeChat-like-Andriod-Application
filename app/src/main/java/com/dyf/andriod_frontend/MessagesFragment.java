@@ -149,21 +149,21 @@ public class MessagesFragment extends Fragment {
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("PHOTO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 1);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 3, json_contact.getJSONObject(0).getString("content")));
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 2, json_contact.getJSONObject(0).getString("content")));
                             messageAdapter.notifyDataSetChanged();
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("VIDEO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 2);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 5, json_contact.getJSONObject(0).getString("content")));
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 3, json_contact.getJSONObject(0).getString("content")));
                             messageAdapter.notifyDataSetChanged();
                         }
                     }
                     else if (json_contact.getJSONObject(0).getString("messageType").equals("AUDIO")) {
                         sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 3);
                         if(json_contact.getJSONObject(0).getJSONObject("fromUser").getString("username").equals(talkToName)) {
-                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 7, json_contact.getJSONObject(0).getString("content")));
+                            data.add(new MessageA(talkToName, R.drawable.contacts_6, 6, json_contact.getJSONObject(0).getString("content")));
                             messageAdapter.notifyDataSetChanged();
                         }
                     }
@@ -172,10 +172,37 @@ public class MessagesFragment extends Fragment {
                 {
                     SharedPreferences sp = mainActivity.getSharedPreferences(getString(R.string.store), Context.MODE_PRIVATE);
                     String username = sp.getString("username", "");
-                    if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
-                    {
-                        data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, json_contact.getJSONObject(0).getString("content"), 0));
-                        messageAdapter.notifyDataSetChanged();
+                    if(json_contact.getJSONObject(0).getString("messageType").equals("TEXT")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 0);
+                        if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
+                        {
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, json_contact.getJSONObject(0).getString("content"), 0));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if(json_contact.getJSONObject(0).getString("messageType").equals("PHOTO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 1);
+                        if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
+                        {
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 2, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if(json_contact.getJSONObject(0).getString("messageType").equals("VIDEO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 2);
+                        if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
+                        {
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 4, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
+                    }
+                    else if(json_contact.getJSONObject(0).getString("messageType").equals("AUDIO")) {
+                        sendNotificationOfNewMessage(talkToName, json_contact.getJSONObject(0).getString("content"), 3);
+                        if(json_contact.getJSONObject(0).getJSONObject("group").getString("id").equals(talkToId) && !json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username").equals(username))
+                        {
+                            data.add(new MessageA(json_contact.getJSONObject(0).getJSONObject("fromUserId").getString("username"), R.drawable.contacts_1, 6, json_contact.getJSONObject(0).getString("content")));
+                            messageAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
 //                id = new String(json_contact.getJSONObject(0).getJSONObject("sentUser").get("id").toString());
@@ -440,29 +467,34 @@ public class MessagesFragment extends Fragment {
 //        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
         mainActivity = (MainActivity ) getActivity();
         doRegisterReceiver();
-        mLocationClient = new LocationClient(getActivity().getApplicationContext());
-        mLocationClient.registerLocationListener(new MyLocationListener());
-        SDKInitializer.initialize(getActivity().getApplicationContext());
-//        baiduMap = mapView.getMap();
-//        baiduMap.setMyLocationEnabled(true);
-//        checkVersion();
-        List<String> permissionList = new ArrayList<>();
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.READ_PHONE_STATE);
-        }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-        if (!permissionList.isEmpty()) {
-            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
-            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
-        }
+//        mLocationClient = new LocationClient(getActivity().getApplicationContext());
+//        mLocationClient.registerLocationListener(new MyLocationListener());
+//        SDKInitializer.initialize(getActivity().getApplicationContext());
+////        baiduMap = mapView.getMap();
+////        baiduMap.setMyLocationEnabled(true);
+////        checkVersion();
+//        List<String> permissionList = new ArrayList<>();
+//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+//        }
+////        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+////            permissionList.add(Manifest.permission.READ_PHONE_STATE);
+////        }
+//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//        }
+//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+//        }
+//        if (!permissionList.isEmpty()) {
+//            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+//            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
+//        }
+//        else {
+//            requestLocation();
+//        }
+
+
         mMediaRecorderUtils = new MediaRecorderUtils.Builder(getActivity())
                 .setAudioSource(MediaRecorder.AudioSource.MIC)//麦克
                 .setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB)//AMR
@@ -759,17 +791,32 @@ public class MessagesFragment extends Fragment {
                 transaction.commit();
             }
         });
-        titleBack_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
-                groupInfoFragment.saveMessageInfo(talkToId);
-                transaction.replace(R.id.flFragment, groupInfoFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
+        if(chat_type == 1) {
+            titleBack_2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
+                    groupInfoFragment.saveMessageInfo(chat_type, talkToName, talkToId);
+                    transaction.replace(R.id.flFragment, groupInfoFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+            });
+        }
+        else if(chat_type == 0) {
+            titleBack_2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
+                    groupInfoFragment.saveMessageInfo(chat_type, talkToName, talkToId);
+                    transaction.replace(R.id.flFragment, groupInfoFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+            });
+        }
 //        listView.setSelection(listView.getBottom());
     }
 
@@ -999,9 +1046,9 @@ public class MessagesFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLocationClient.stop();
-        mapView.onDestroy();
-        baiduMap.setMyLocationEnabled(false);
+//        mLocationClient.stop();
+//        mapView.onDestroy();
+//        baiduMap.setMyLocationEnabled(false);
         mMediaRecorderUtils.onDestroy();
     }
 
