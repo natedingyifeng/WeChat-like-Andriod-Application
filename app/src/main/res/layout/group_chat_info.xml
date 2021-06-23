@@ -49,6 +49,14 @@
         android:paddingBottom="2dp">
 
         <Button
+            android:id="@+id/button_group_messages_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="查看聊天记录"
+            android:textColor="#E91E63"
+            app:backgroundTint="#FFFFFF" />
+
+        <Button
             android:id="@+id/button_addmorefriend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

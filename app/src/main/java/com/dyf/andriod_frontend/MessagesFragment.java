@@ -811,12 +811,10 @@ public class MessagesFragment extends Fragment {
             titleBack_2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    GroupInfoFragment groupInfoFragment = new GroupInfoFragment();
-                    groupInfoFragment.saveMessageInfo(chat_type, talkToName, talkToId);
-                    transaction.replace(R.id.flFragment, groupInfoFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
+                    Intent intent = new Intent(getActivity(),ChatHistoryActivity.class);
+                    intent.putExtra("talkToId",talkToId);
+                    intent.putExtra("talkToName",talkToName);
+                    startActivity(intent);
                 }
             });
         }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,14 +29,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.dyf.andriod_frontend.contact.Contact;
-import com.dyf.andriod_frontend.groupInfo.GroupInfoAdapter;
-import com.dyf.andriod_frontend.groupInfo.groupInfo;
-import com.dyf.andriod_frontend.groupMemberIcons.Icons;
-import com.dyf.andriod_frontend.groupMemberIcons.IconsAdapter;
 import com.dyf.andriod_frontend.utils.HttpRequest;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -54,19 +48,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import android.os.Handler;
-
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link CreateGroupMemberFragment#newInstance} factory method to
+ * Use the {@link AddNewGroupMemberFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CreateGroupMemberFragment extends Fragment {
+public class AddNewGroupMemberFragment extends Fragment {
     private LinearLayout menuLinerLayout;
 
     private ListView listView;
@@ -78,13 +69,18 @@ public class CreateGroupMemberFragment extends Fragment {
     private Handler handler;
     private Handler handler_create;
     private List<String> id_groups;
+    private String group_id;
     private String userid;
 
     @BindView(R.id.bottomNavigationView)
     public BottomNavigationView bottomNavigationView;
 
-    public CreateGroupMemberFragment() {
+    public AddNewGroupMemberFragment() {
         // Required empty public constructor
+    }
+
+    public void setInfo(String id) {
+        this.group_id = id;
     }
 
     public class CreateGroupContactsAdapter extends BaseAdapter {
@@ -205,8 +201,8 @@ public class CreateGroupMemberFragment extends Fragment {
      * @return A new instance of fragment MessageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CreateGroupMemberFragment newInstance() {
-        CreateGroupMemberFragment fragment = new CreateGroupMemberFragment();
+    public static AddNewGroupMemberFragment newInstance() {
+        AddNewGroupMemberFragment fragment = new AddNewGroupMemberFragment();
         return fragment;
     }
 
@@ -217,7 +213,7 @@ public class CreateGroupMemberFragment extends Fragment {
 //        bottomNavigationView.animate().translationY(bottomNavigationView.getHeight());
 //        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
         TextView title = getActivity().findViewById(R.id.title_text);
-        title.setText("创建群聊");
+        title.setText("邀请联系人");
         id_groups = new LinkedList<>();
         listView = (ListView) getActivity().findViewById(R.id.groupchat_add_contacts_listview);
         menuLinerLayout = (LinearLayout) getActivity().findViewById(R.id.linearLayoutMenu);
@@ -235,7 +231,7 @@ public class CreateGroupMemberFragment extends Fragment {
             }
         });
         EditText group_name = getActivity().findViewById(R.id.group_name);
-        group_name.setVisibility(View.VISIBLE);
+        group_name.setVisibility(View.INVISIBLE);
         Button title_back_2 = getActivity().findViewById(R.id.title_back2);
         title_back_2.setVisibility(View.INVISIBLE);
         button = (Button) getActivity().findViewById(R.id.button_create_groupchat);
@@ -301,15 +297,15 @@ public class CreateGroupMemberFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 IdentityHashMap<String, String> params = new IdentityHashMap<>();
-                params.put("groupName", group_name.getText().toString());
-                id_groups.add(userid);
+                params.put("groupChatID", group_id);
+//                id_groups.add(userid);
                 HashMap<String, List<String>> listParams = new HashMap<>();
-                listParams.put("memberIds", id_groups);
+                listParams.put("inviteMemberIds", id_groups);
 
                 Log.d("list", id_groups.toString());
 
                 try {
-                    HttpRequest.sendOkHttpPostRequest("group/new", new okhttp3.Callback() {
+                    HttpRequest.sendOkHttpPostRequest("group/invite", new Callback() {
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e) {
                             Looper.prepare();
@@ -325,11 +321,11 @@ public class CreateGroupMemberFragment extends Fragment {
                                 JSONObject jsonObject = new JSONObject(resStr);
                                 if (jsonObject.getBoolean("success")){
                                     Looper.prepare();
-                                    Toast.makeText(getActivity().getApplicationContext(),"创建群聊成功", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity().getApplicationContext(),"添加成功", Toast.LENGTH_SHORT).show();
                                     handler_create.sendEmptyMessage(1);
                                 }else{
                                     Looper.prepare();
-                                    Toast.makeText(getActivity().getApplicationContext(),"创建群聊失败", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity().getApplicationContext(),"添加失败", Toast.LENGTH_SHORT).show();
                                     handler_create.sendEmptyMessage(1);
                                     Looper.loop();
                                 }
@@ -386,7 +382,7 @@ public class CreateGroupMemberFragment extends Fragment {
         total++;
         // 包含TextView的LinearLayout
         // 参数设置
-        android.widget.LinearLayout.LayoutParams menuLinerLayoutParames = new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams menuLinerLayoutParames = new LinearLayout.LayoutParams(
                 120, 120);
         View view = LayoutInflater.from(getActivity()).inflate(
                 R.layout.header_item, null);
@@ -400,7 +396,7 @@ public class CreateGroupMemberFragment extends Fragment {
         }
 
         menuLinerLayout.addView(view, menuLinerLayoutParames);
-        button.setText("创建群聊(" + total + ")");
+        button.setText("邀请联系人(" + total + ")");
         addList.add(glufineid.getNickname());
     }
 
@@ -409,7 +405,7 @@ public class CreateGroupMemberFragment extends Fragment {
 
         menuLinerLayout.removeView(view);
         total--;
-        button.setText("创建群聊(" + total + ")");
+        button.setText("邀请联系人(" + total + ")");
         addList.remove(glufineid.getNickname());
         if (total < 1) {
             button.setText("创建群聊");

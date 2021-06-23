@@ -10,6 +10,7 @@ public class MessageA {
     private final int componentType;
     private final String content_image;
     private final String video_path;
+    private final String msg_id;
 
     public MessageA(String nickname, int avatarIcon, String content, int componentType) {
         this.avatarIcon = avatarIcon;
@@ -17,6 +18,7 @@ public class MessageA {
         this.componentType = componentType;
         this.content_image = null;
         this.video_path = null;
+        this.msg_id = "";
     }
 
     public MessageA(String nickname, int avatarIcon, int componentType, String content_image) {
@@ -25,7 +27,27 @@ public class MessageA {
         this.componentType = componentType;
         this.content_image = content_image;
         this.video_path = null;
+        this.msg_id = "";
     }
+
+    public MessageA(String nickname, int avatarIcon, String content, int componentType, String id) {
+        this.avatarIcon = avatarIcon;
+        this.content = content;
+        this.componentType = componentType;
+        this.content_image = null;
+        this.video_path = null;
+        this.msg_id = id;
+    }
+
+    public MessageA(String nickname, int avatarIcon, int componentType, String content_image, String id) {
+        this.avatarIcon = avatarIcon;
+        this.content = "";
+        this.componentType = componentType;
+        this.content_image = content_image;
+        this.video_path = null;
+        this.msg_id = id;
+    }
+
 
 //    public MessageA(String nickname, String avatarIcon, int componentType, String path) {
 //        this.avatarIcon = avatarIcon;
@@ -46,6 +68,8 @@ public class MessageA {
     public int getComponentType() { return componentType; }
 
     public String getContentImage() { return content_image; }
+
+    public String getMsgId() {return msg_id;}
 
 //    public String getVideoPath() { return video_path; }
 }

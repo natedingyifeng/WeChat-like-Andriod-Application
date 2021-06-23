@@ -35,6 +35,8 @@
         <activity android:name=".moments.MomentsVideoReleaseActivity" />
         <activity android:name=".user.UserInfoActivity" />
         <activity android:name=".Setting.SettingsPasswordModifyActivity" />
+        <activity android:name=".ChatHistoryActivity" />
+        <activity android:name=".GroupChatHistoryActivity" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
