@@ -188,10 +188,10 @@ public class MomentsVideoReleaseActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
                     if (jsonObject.getBoolean("success")){
+                        MomentsVideoReleaseActivity.this.finish();
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(), "发布成功", Toast.LENGTH_SHORT).show();
                         Looper.loop();
-                        MomentsVideoReleaseActivity.this.finish();
                     }else{
                         Looper.prepare();
                         Toast.makeText(getApplicationContext(),"发布错误", Toast.LENGTH_SHORT).show();
@@ -220,6 +220,9 @@ public class MomentsVideoReleaseActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String resStr = response.body().string();
+                if (resStr.charAt(resStr.length()-1) != '}'){
+                    resStr = resStr + "}";
+                }
                 Log.e("response", resStr);
                 try {
                     JSONObject jsonObject = new JSONObject(resStr);
