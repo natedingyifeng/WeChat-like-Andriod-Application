@@ -1,2 +1,2 @@
 # andriod_frontend
- Thss Andriod Course Project
+Class project for Introduction to Mobile Application Development: a WeChat-like Andriod application
